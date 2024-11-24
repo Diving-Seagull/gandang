@@ -41,3 +41,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# .env File
+assets/config/.env
+
+# iOS config files
+ios/Config.xcconfig
