@@ -1,4 +1,4 @@
-package gandang.global.exception;
+package gandang.common.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,8 @@ public enum ExceptionCode {
 
     MEMBER_LOCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자의 위치를 찾을 수 없습니다."),
 
+    LANGUAGE_DETECTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "언어 감지 중 오류가 발생했습니다."),
+    TRANSLATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "번역 중 오류가 발생했습니다."),
 
     ;
 

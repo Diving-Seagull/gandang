@@ -1,22 +1,22 @@
 package gandang.auth.service;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 import gandang.auth.client.GoogleClient;
 import gandang.auth.client.KakaoClient;
 import gandang.auth.dto.GoogleUserInfo;
 import gandang.auth.dto.KakaoUserInfo;
 import gandang.auth.dto.SocialAuthRequestDto;
 import gandang.auth.dto.TokenResponseDto;
-import gandang.global.exception.CustomException;
-import gandang.global.exception.ExceptionCode;
-import gandang.global.utils.JwtUtil;
+import gandang.common.exception.CustomException;
+import gandang.common.exception.ExceptionCode;
+import gandang.common.utils.JwtUtil;
 import gandang.member.entity.Member;
 import gandang.member.enums.SocialType;
 import gandang.member.repository.MemberRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +46,8 @@ public class AuthService {
         GoogleUserInfo googleUserInfo = googleClient.getGoogleUserInfo(requestDto.getSocialToken());
 
         Member member = memberRepository.findByEmail(googleUserInfo.getEmail())
-            .orElseGet(() -> registerNewGoogleMember(googleUserInfo, requestDto.getFirebaseToken()));
+            .orElseGet(
+                () -> registerNewGoogleMember(googleUserInfo, requestDto.getFirebaseToken()));
 
         String jwtToken = jwtUtil.generateToken(member.getEmail());
         return new TokenResponseDto(jwtToken);
@@ -59,7 +60,7 @@ public class AuthService {
         Member newMember = Member.builder()
             .email(kakaoUserInfo.getEmail())
             .name(kakaoUserInfo.getNickname())
-            .profile(kakaoUserInfo.getProfileImageUrl())
+            .profileImage(kakaoUserInfo.getProfileImageUrl())
             .socialType(SocialType.KAKAO)
             .firebaseToken(firebaseToken)
             .build();
@@ -73,7 +74,7 @@ public class AuthService {
         Member newMember = Member.builder()
             .email(googleUserInfo.getEmail())
             .name(googleUserInfo.getName())
-            .profile(googleUserInfo.getPicture())
+            .profileImage(googleUserInfo.getPicture())
             .socialType(SocialType.GOOGLE)
             .firebaseToken(firebaseToken)
             .build();

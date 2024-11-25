@@ -1,12 +1,12 @@
 package gandang.auth.client;
 
+import gandang.auth.dto.GoogleUserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import gandang.auth.dto.GoogleUserInfo;
 
 @Component
 @RequiredArgsConstructor

@@ -1,16 +1,14 @@
 package gandang.member.entity;
 
+import gandang.member.enums.SocialType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -20,9 +18,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import gandang.member.enums.Role;
-import gandang.member.enums.SocialType;
-import gandang.team.entity.Team;
 
 @Entity
 @Table(name = "members")
@@ -41,10 +36,7 @@ public class Member {
     @Column(length = 20)
     private String name;
 
-    @Column(length = 50)
-    private String description;
-
-    private String profile;
+    private String profileImage;
 
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
@@ -66,31 +58,24 @@ public class Member {
     private String languageCode = "ko";
 
     @Builder
-    private Member(Long id, String email, String name, String description, String profile,
+    private Member(Long id, String email, String name, String profileImage,
         SocialType socialType, String firebaseToken, String languageCode) {
         this.id = id;
         this.email = email;
         this.name = name;
-        this.description = description;
-        this.profile = profile;
+        this.profileImage = profileImage;
         this.socialType = socialType;
         this.firebaseToken = firebaseToken;
         this.languageCode = (languageCode != null) ? languageCode : "ko";
     }
 
-    public void initMember(Role role, String name, String description, String profile, String languageCode) {
-        this.role = (role != null) ? role : this.role;
-        this.description = description;
-        this.deviceUuid = deviceUuid;
+    public void initMember(String name, String profile, String languageCode) {
 
         if (name != null) {
             this.name = name;
         }
         if (profile != null) {
-            this.profile = profile;
-        }
-        if (team != null) {
-            this.team = team;
+            this.profileImage = profile;
         }
         if (languageCode != null) {
             this.languageCode = languageCode;

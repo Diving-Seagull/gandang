@@ -1,4 +1,4 @@
-package gandang.global.utils;
+package gandang.common.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

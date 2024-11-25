@@ -1,8 +1,12 @@
 package gandang.auth;
 
-import static gandang.global.exception.ExceptionCode.JWT_TOKEN_MISSING;
-import static gandang.global.exception.ExceptionCode.TOKEN_EXPIRED;
+import static gandang.common.exception.ExceptionCode.JWT_TOKEN_MISSING;
+import static gandang.common.exception.ExceptionCode.TOKEN_EXPIRED;
 
+import gandang.common.exception.CustomException;
+import gandang.common.utils.JwtUtil;
+import gandang.member.entity.Member;
+import gandang.member.service.MemberService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -10,10 +14,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import gandang.global.exception.CustomException;
-import gandang.global.utils.JwtUtil;
-import gandang.member.entity.Member;
-import gandang.member.service.MemberService;
 
 @Component
 @AllArgsConstructor

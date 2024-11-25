@@ -1,12 +1,9 @@
 package gandang.member.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import gandang.common.validation.ValidLanguageCode;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import gandang.global.validation.ValidLanguageCode;
-import gandang.member.enums.Role;
 
 @Getter
 @NoArgsConstructor

@@ -1,8 +1,8 @@
-package gandang.global.exception;
+package gandang.common.exception;
 
+import gandang.common.utils.ApiUtils;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import gandang.global.utils.ApiUtils;
 
 @Getter
 public class CustomException extends RuntimeException {

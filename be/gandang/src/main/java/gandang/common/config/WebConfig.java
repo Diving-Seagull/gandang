@@ -1,5 +1,6 @@
-package gandang.global.config;
+package gandang.common.config;
 
+import gandang.auth.LoginMemberArgumentResolver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -7,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import gandang.auth.LoginMemberArgumentResolver;
 
 @Configuration
 @RequiredArgsConstructor

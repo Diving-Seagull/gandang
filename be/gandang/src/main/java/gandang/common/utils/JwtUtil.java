@@ -1,4 +1,4 @@
-package gandang.global.utils;
+package gandang.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

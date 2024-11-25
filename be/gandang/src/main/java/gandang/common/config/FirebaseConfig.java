@@ -1,4 +1,4 @@
-package gandang.global.config;
+package gandang.common.config;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;

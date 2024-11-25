@@ -1,5 +1,7 @@
-package gandang.global.handler;
+package gandang.common.handler;
 
+import gandang.common.exception.CustomException;
+import gandang.common.utils.ApiUtils;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,8 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import gandang.global.exception.CustomException;
-import gandang.global.utils.ApiUtils;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {

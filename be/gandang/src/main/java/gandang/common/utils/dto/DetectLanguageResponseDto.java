@@ -1,4 +1,4 @@
-package gandang.global.utils.dto;
+package gandang.common.utils.dto;
 
 import com.google.cloud.translate.Detection;
 import lombok.AllArgsConstructor;
