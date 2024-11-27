@@ -4,8 +4,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gandang/data/google_login_api.dart';
 import 'package:gandang/data/kakao_login_api.dart';
 import 'package:gandang/view/login_view.dart';
+import 'package:gandang/view/main_view.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
@@ -21,7 +24,8 @@ class _SplashViewState extends ConsumerState<SplashView> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Timer(const Duration(seconds: 2), () {
-        _kakaoCheckAuth();
+        // _kakaoCheckAuth();
+        _googleCheckAuth();
       });
     });
   }
@@ -32,30 +36,25 @@ class _SplashViewState extends ConsumerState<SplashView> {
     if (tokenInfo != null) {
         print('자동 로그인 카카오 토큰 정보 불러옴 ${tokenInfo.accessToken}');
         // JWT 요청
+        moveMainScreen();
         return;
       }
-    _moveLoginScreen();
+    _googleCheckAuth();
   }
-  //
-  // // 구글 토큰 검사
-  // Future<void> googleCheckAuth() async {
-  //   GoogleSignInAuthentication? auth = await viewModel.googleRecentLogin();
-  //   if (auth != null) {
-  //     TokenDto? jwtToken =
-  //         await viewModel.getJwtToken(auth.accessToken!, "google");
-  //     print(jwtToken);
-  //
-  //     if (jwtToken != null) {
-  //       print('구글 자동 로그인 성공 ${jwtToken.token}');
-  //       await _storage.write(key: 'jwtToken', value: jsonEncode(jwtToken));
-  //       // moveMainScreen();
-  //       checkRegister();
-  //       return;
-  //     }
-  //   }
-  //   print('구글 자동 로그인 실패');
-  //   moveLoginScreen();
-  // }
+
+  // 구글 토큰 검사
+  Future<void> _googleCheckAuth() async {
+    GoogleSignInAccount? account = await GoogleLoginApi.instance.checkRecentLogin();
+    if (account != null) {
+        GoogleSignInAuthentication auth = await account.authentication;
+        print('자동 로그인 구글 토큰 정보 불러옴 ${auth.accessToken}');
+        //JWT 요청
+        moveMainScreen();
+        return;
+      }
+    print('구글 자동 로그인 실패');
+    moveLoginScreen();
+  }
   //
   // void checkRegister() async {
   //   var member = await viewModel.getMember();
@@ -71,7 +70,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   // }
   //
   // 로그인 화면 이동
-  void _moveLoginScreen() {
+  void moveLoginScreen() {
     if (mounted) {
       Navigator.pop(context); //Splash 화면 제거
       Navigator.push(
@@ -80,14 +79,14 @@ class _SplashViewState extends ConsumerState<SplashView> {
   }
 
 
-  // // 메인 화면 이동
-  // void moveMainScreen() {
-  //   if (mounted) {
-  //     Navigator.pop(context); //Splash 화면 제거
-  //     Navigator.push(
-  //         context, CupertinoPageRoute(builder: (context) => HomePage()));
-  //   }
-  // }
+  // 메인 화면 이동
+  void moveMainScreen() {
+    if (mounted) {
+      Navigator.pop(context); //Splash 화면 제거
+      Navigator.push(
+          context, CupertinoPageRoute(builder: (context) => MainView()));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

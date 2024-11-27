@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gandang/data/google_login_api.dart';
 import 'package:gandang/data/kakao_login_api.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginView extends ConsumerWidget {
   const LoginView({super.key});
@@ -15,9 +17,17 @@ class LoginView extends ConsumerWidget {
             children: [
               FilledButton(onPressed: () async{
                  var accessToken = await KakaoLoginApi.instance.signWithKakao();
-                 print('카카오 토큰 정보 : $accessToken');
+                 print('카카오 액세스 토큰 정보 : $accessToken');
               },
-                  child: const Text('카카오'))
+                  child: const Text('카카오')),
+              FilledButton(onPressed: () async{
+                GoogleSignInAccount? account = await GoogleLoginApi.instance.signInWithGoogle();
+                if(account != null) {
+                  GoogleSignInAuthentication auth = await account.authentication;
+                  print('구글 액세스 토큰 정보 : ${auth.accessToken}');
+                }
+              },
+                  child: const Text('구글'))
             ],
           )
       ),
