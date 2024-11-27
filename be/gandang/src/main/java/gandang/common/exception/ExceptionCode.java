@@ -13,6 +13,15 @@ public enum ExceptionCode {
     USER_EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
 
+    // Apple 인증 관련
+    APPLE_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 Apple 토큰입니다."),
+    APPLE_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "만료된 Apple 토큰입니다."),
+    APPLE_TOKEN_PARSE_ERROR(HttpStatus.BAD_REQUEST, "Apple 토큰 파싱 중 오류가 발생했습니다."),
+    APPLE_EMAIL_MISSING(HttpStatus.BAD_REQUEST, "Apple 계정의 이메일 정보가 제공되지 않았습니다."),
+    APPLE_USER_DISABLED(HttpStatus.FORBIDDEN, "비활성화된 Apple 계정입니다."),
+    APPLE_AUTH_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Apple 인증 서버 오류가 발생했습니다."),
+
+
 
     // 잘못된 접근,
     SOCIAL_TOKEN_MISSING(HttpStatus.BAD_REQUEST, "소셜 토큰이 제공되지 않았습니다."),

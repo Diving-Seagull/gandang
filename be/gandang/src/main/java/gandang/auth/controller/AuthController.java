@@ -30,4 +30,11 @@ public class AuthController {
         TokenResponseDto tokenResponse = authService.googleAuth(requestDto);
         return ResponseEntity.ok(tokenResponse);
     }
+
+    @PostMapping("/apple")
+    public ResponseEntity<TokenResponseDto> appleAuth(
+        @RequestBody SocialAuthRequestDto requestDto) {
+        TokenResponseDto tokenResponse = authService.appleAuth(requestDto);
+        return ResponseEntity.ok(tokenResponse);
+    }
 }

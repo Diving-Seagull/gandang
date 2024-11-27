@@ -51,6 +51,9 @@ dependencies {
 
 	// Apache Commons Text
 	implementation 'org.apache.commons:commons-text:1.9'
+
+	// JWT 검증
+	implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
 }
 
 tasks.named('test') {
