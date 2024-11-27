@@ -44,6 +44,7 @@ dependencies:
   firebase_core: ^3.8.0
   flutter_local_notifications: ^18.0.1
   shared_preferences: ^2.3.3
+  change_app_package_name: ^1.4.0
 
 dev_dependencies:
   flutter_test:

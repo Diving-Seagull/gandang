@@ -25,7 +25,8 @@ class _SplashViewState extends ConsumerState<SplashView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Timer(const Duration(seconds: 2), () {
         // _kakaoCheckAuth();
-        _googleCheckAuth();
+        // _googleCheckAuth();
+        moveLoginScreen();
       });
     });
   }
