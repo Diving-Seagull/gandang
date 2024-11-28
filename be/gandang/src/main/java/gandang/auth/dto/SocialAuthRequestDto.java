@@ -1,18 +1,18 @@
 package gandang.auth.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class SocialAuthRequestDto {
 
     @NotNull(message = "Social token is required")
-    @JsonProperty("token")
     private String socialToken;
 
-    @JsonProperty("firebaseToken")
     private String firebaseToken;
 }
