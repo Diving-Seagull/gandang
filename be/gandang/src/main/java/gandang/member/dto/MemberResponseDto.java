@@ -1,5 +1,7 @@
 package gandang.member.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gandang.member.entity.Member;
 import gandang.member.enums.SocialType;
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberResponseDto {
 
     private Long id;

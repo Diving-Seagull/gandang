@@ -1,16 +1,16 @@
-package gandang.auth.dto;
+package gandang.route.dto;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-@AllArgsConstructor
 @Getter
-@Setter
+@Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TokenResponseDto {
-
-    private String token;
+public class RouteStarResponseDto {
+    private Long routeId;
+    private Long starId;
+    private LocalDateTime starredAt;
 }
