@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gandang/data/google_login_api.dart';
 import 'package:gandang/data/kakao_login_api.dart';
-import 'package:gandang/view/login_view.dart';
+import 'package:gandang/view/login/login_view.dart';
 import 'package:gandang/view/main_view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -27,6 +27,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
         // _kakaoCheckAuth();
         // _googleCheckAuth();
         moveLoginScreen();
+        // moveMainScreen();
       });
     });
   }
