@@ -3,7 +3,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 class AppleLoginApi {
   static final instance = AppleLoginApi();
 
-  signInWithApple() async {
+  Future<AuthorizationCredentialAppleID?> signInWithApple() async {
     try {
       return await SignInWithApple.getAppleIDCredential(
         scopes: [
