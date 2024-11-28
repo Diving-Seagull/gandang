@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gandang/view/global/color_data.dart';
 import 'package:gandang/view/login/splash_view.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -54,11 +55,32 @@ void main() async {
     nativeAppKey: '${dotenv.env['KAKAO_NATIVE_APP_KEY']}'
   );
 
-  runApp(const GandangApp());
+  runApp(const ProviderScope(child: GandangApp()));
+}
+
+Future<void> _initFcmToken() async {
+  // Firebase 초기화 후 토큰 저장하기
+  try {
+    String? token = await _firebaseMessaging.getToken();
+    var preference = await SharedPreferences.getInstance();
+    String? saved_token = preference.getString("fcmToken");
+    print('FCM Token: $token');
+    if (token != null) {
+      // fcm 토큰 저장
+      if(saved_token == null || saved_token != token) {
+        print('새로운 FCM 토큰 저장');
+        await preference.setString('fcmToken', token);
+      }
+    }
+  } catch (e) {
+    print('Error fetching FCM token: $e');
+  }
 }
 
 Future<void> setupFCM() async {
-  NotificationSettings settings = await _firebaseMessaging.requestPermission(
+    await _initFcmToken();
+
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
     alert: true,
     announcement: false,
     badge: true,

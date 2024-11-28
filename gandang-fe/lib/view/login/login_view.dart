@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gandang/data/apple_login_api.dart';
-import 'package:gandang/data/google_login_api.dart';
-import 'package:gandang/data/kakao_login_api.dart';
+import 'package:gandang/data/global/apple_login_api.dart';
+import 'package:gandang/data/model/jwt_data.dart';
+import 'package:gandang/data/model/token_dto.dart';
+import 'package:gandang/provider/login_notifier.dart';
+import 'package:gandang/provider/login_provider.dart';
 import 'package:gandang/view/global/color_data.dart';
+import 'package:gandang/viewmodel/login_viewmodel.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../../data/global/google_login_api.dart';
+import '../../data/global/kakao_login_api.dart';
+
 class LoginView extends ConsumerWidget {
-  const LoginView({super.key});
+  LoginView({super.key});
+  final LoginViewModel _viewModel = LoginViewModel();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,25 +30,50 @@ class LoginView extends ConsumerWidget {
                 const SizedBox(),
                 Container(
                     width: MediaQuery.of(context).size.width,
+                    margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 25),
                     child: Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Column(
+                          const Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('시작하기 전에'),
+                              Text('시작하기 전에',
+                                style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               Row(
                                 children: [
-                                  Text('로그인'),
-                                  Text('이 필요해요')
+                                  Text('로그인',
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                      color: ColorData.PRIMARY_COLOR
+                                    ),
+                                  ),
+                                  Text('이 필요해요',
+                                    style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
                                 ],
                               ),
-                              Text('3초면 시작할 수 있어요!')
+                              SizedBox(height: 20),
+                              Text('3초면 시작할 수 있어요!',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorData.CONTENTS_200
+                                ),
+                              )
                             ],
                           ),
-                          _kakaoLoginBtn(context),
+                          SizedBox(height: 60),
+                          _kakaoLoginBtn(context, ref),
                           const SizedBox(height: 10),
                           _googleLoginBtn(context),
                           const SizedBox(height: 10),
@@ -47,11 +81,10 @@ class LoginView extends ConsumerWidget {
                         ],
                       )
                     ),
-                  margin: EdgeInsets.symmetric(vertical: 30, horizontal: 25),
                 ),
                 Container(
-                  padding: EdgeInsetsDirectional.symmetric(horizontal: 25, vertical: 10),
-                  child: Text('로그인이 안되나요?',
+                  padding: const EdgeInsetsDirectional.symmetric(horizontal: 25, vertical: 10),
+                  child: const Text('로그인이 안되나요?',
                     style: TextStyle(
                       decoration: TextDecoration.underline,
                       decorationColor: ColorData.CONTENTS_100,
@@ -66,7 +99,7 @@ class LoginView extends ConsumerWidget {
     );
   }
   // 카카오 로그인 버튼
-  Widget _kakaoLoginBtn(BuildContext context) => Container(
+  Widget _kakaoLoginBtn(BuildContext context, WidgetRef ref) => Container(
       height: 58,
       decoration: BoxDecoration(
           color: const Color(0xFFFDE500),
@@ -75,7 +108,18 @@ class LoginView extends ConsumerWidget {
       ),
       child: TextButton(
         onPressed: () async {
-
+          OAuthToken? token = await KakaoLoginApi.instance.signWithKakao();
+          if(token != null) {
+            //로그인 성공
+            print('카카오 액세스 토큰 정보 : ${token.accessToken}');
+            var prefer = await SharedPreferences.getInstance();
+            var firebase_token = prefer.getString('fcmToken');
+            var data = TokenDto(token.accessToken, firebase_token!);
+            var result = await _viewModel.setLogin(data, 'kakao');
+            if(result != null) {
+              print('카카오 로그인 정보 $result');
+            }
+          }
         },
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.zero, // 안쪽 여백 직접 조정
@@ -105,7 +149,18 @@ class LoginView extends ConsumerWidget {
           ),
           child: TextButton(
             onPressed: () async {
-
+              GoogleSignInAccount userInfo = await GoogleLoginApi.instance.signInWithGoogle();
+              var auth = await userInfo.authentication;
+              if(auth.accessToken != null) {
+                  print('구글 액세스 토큰 : ${auth.accessToken}');
+                  var prefer = await SharedPreferences.getInstance();
+                  var firebase_token = prefer.getString('fcmToken');
+                  var data = TokenDto(auth.accessToken!, firebase_token!);
+                  var result = await _viewModel.setLogin(data, 'google');
+                  if(result != null) {
+                    print('구글 로그인 정보 $result');
+                  }
+              }
             },
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.zero, // 안쪽 여백 직접 조정
@@ -135,7 +190,17 @@ class LoginView extends ConsumerWidget {
       ),
       child: TextButton(
         onPressed: () async {
-
+          AuthorizationCredentialAppleID? login = await AppleLoginApi.instance.signInWithApple();
+          if(login != null) {
+            print('Apple 로그인 정보 : ${login.identityToken}');
+            var prefer = await SharedPreferences.getInstance();
+            var firebase_token = prefer.getString('fcmToken');
+            var data = TokenDto(login.identityToken!, firebase_token!);
+            var result = await _viewModel.setLogin(data, 'apple');
+            if(result != null) {
+              print('Apple 로그인 정보 $result');
+            }
+          }
         },
         style: ElevatedButton.styleFrom(
           padding: EdgeInsets.zero, // 안쪽 여백 직접 조정
