@@ -1,6 +1,6 @@
-package gandang.pm.repository;
+package gandang.bicycleStation.repository;
 
-import gandang.pm.entity.BicycleStation;
+import gandang.bicycleStation.entity.BicycleStation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

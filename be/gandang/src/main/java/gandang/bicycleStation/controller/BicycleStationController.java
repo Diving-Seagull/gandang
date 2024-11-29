@@ -1,7 +1,7 @@
-package gandang.pm.controller;
+package gandang.bicycleStation.controller;
 
-import gandang.pm.dto.NearestBicycleStationResponseDto;
-import gandang.pm.service.BicycleStationService;
+import gandang.bicycleStation.dto.NearestBicycleStationResponseDto;
+import gandang.bicycleStation.service.BicycleStationService;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.RequiredArgsConstructor;
