@@ -17,7 +17,6 @@ import gandang.route.entity.RouteStar;
 import gandang.route.repository.RouteRepository;
 import gandang.route.repository.RouteStarRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
