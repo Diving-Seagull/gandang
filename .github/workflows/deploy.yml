@@ -5,6 +5,7 @@ on:
     paths:
       - 'be/**'
       - '.github/workflows/**'
+      - 'task-definition.json'
 
 env:
   AWS_REGION: ap-northeast-2
