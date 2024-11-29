@@ -7,4 +7,5 @@ class ColorData {
   static const Color CONTENTS_050 = Color(0xFFF1F1F1);
   static const Color CONTENTS_100 = Color(0xFFBFBFBF);
   static const Color CONTENTS_200 = Color(0xFF8A8A8A);
+  static const Color CONTENTS_300 = Color(0xFF121212);
 }

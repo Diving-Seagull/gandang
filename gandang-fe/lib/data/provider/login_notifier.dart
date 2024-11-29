@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gandang/data/model/token_dto.dart';
 import 'package:gandang/data/repository/login_repository.dart';
 
-import '../data/login/login_datasource.dart';
-import '../data/model/jwt_data.dart';
+import '../login/login_datasource.dart';
+import '../model/jwt_data.dart';
 import 'login_provider.dart';
 
 class LoginNotifier extends StateNotifier<AsyncValue<JwtData?>> {
