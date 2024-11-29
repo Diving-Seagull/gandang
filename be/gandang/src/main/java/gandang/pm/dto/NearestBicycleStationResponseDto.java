@@ -9,6 +9,7 @@ import lombok.Getter;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class NearestBicycleStationResponseDto {
+
     private String stationName;
     private String address;
     private Double latitude;
