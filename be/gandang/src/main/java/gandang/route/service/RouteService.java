@@ -5,9 +5,10 @@ import static gandang.common.exception.ExceptionCode.ROUTE_NOT_FOUND;
 import static gandang.common.exception.ExceptionCode.ROUTE_STAR_NOT_FOUND;
 
 import gandang.common.exception.CustomException;
+import gandang.common.utils.AddressParser;
 import gandang.member.entity.Member;
-import gandang.member.repository.MemberRepository;
 import gandang.member.service.MemberService;
+import gandang.route.dto.PopularDestinationDto;
 import gandang.route.dto.RouteRequestDto;
 import gandang.route.dto.RouteResponseDto;
 import gandang.route.dto.RouteStarResponseDto;
@@ -16,8 +17,10 @@ import gandang.route.entity.RouteStar;
 import gandang.route.repository.RouteRepository;
 import gandang.route.repository.RouteStarRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,11 +51,45 @@ public class RouteService {
             .id(route.getId())
             .startLatitude(route.getStartLatitude())
             .startLongitude(route.getStartLongitude())
+            .startAddress(route.getStartAddress())
             .endLatitude(route.getEndLatitude())
             .endLongitude(route.getEndLongitude())
+            .endAddress(route.getEndAddress())
+            .distance(route.getDistance())
             .createdAt(route.getCreatedAt())
             .isStarred(starredRouteIds.contains(route.getId()))
             .build());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<RouteResponseDto> getStarredRoutes(String email, Pageable pageable) {
+        Member member = memberService.getMemberEntityByEmail(email);
+
+        Page<Route> starredRoutes = routeRepository.findAllByRouteStarsMember(member, pageable);
+
+        return starredRoutes.map(route -> RouteResponseDto.builder()
+            .id(route.getId())
+            .startLatitude(route.getStartLatitude())
+            .startLongitude(route.getStartLongitude())
+            .startAddress(route.getStartAddress())
+            .endLatitude(route.getEndLatitude())
+            .endLongitude(route.getEndLongitude())
+            .endAddress(route.getEndAddress())
+            .distance(route.getDistance())
+            .createdAt(route.getCreatedAt())
+            .isStarred(true)
+            .build());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PopularDestinationDto> getRecommendedRoutes(String currentAddress) {
+        AddressParser.AddressComponents components = AddressParser.parse(currentAddress);
+        String searchArea = components.getDistrict();
+
+        return routeRepository.findPopularDestinations(
+            searchArea,
+            PageRequest.of(0, 10)
+        );
     }
 
     @Transactional
@@ -63,8 +100,11 @@ public class RouteService {
             .member(member)
             .startLatitude(requestDto.getStartLatitude())
             .startLongitude(requestDto.getStartLongitude())
+            .startAddress(requestDto.getStartAddress())
             .endLatitude(requestDto.getEndLatitude())
             .endLongitude(requestDto.getEndLongitude())
+            .endAddress(requestDto.getEndAddress())
+            .distance(requestDto.getDistance())
             .build();
 
         Route savedRoute = routeRepository.save(route);
@@ -73,9 +113,13 @@ public class RouteService {
             .id(savedRoute.getId())
             .startLatitude(savedRoute.getStartLatitude())
             .startLongitude(savedRoute.getStartLongitude())
+            .startAddress(savedRoute.getStartAddress())
             .endLatitude(savedRoute.getEndLatitude())
             .endLongitude(savedRoute.getEndLongitude())
+            .endAddress(savedRoute.getEndAddress())
+            .distance(savedRoute.getDistance())
             .createdAt(savedRoute.getCreatedAt())
+            .isStarred(false)
             .build();
     }
 

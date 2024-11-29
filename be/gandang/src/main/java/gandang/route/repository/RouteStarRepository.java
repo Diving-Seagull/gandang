@@ -3,12 +3,11 @@ package gandang.route.repository;
 import gandang.member.entity.Member;
 import gandang.route.entity.Route;
 import gandang.route.entity.RouteStar;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface RouteStarRepository extends JpaRepository<RouteStar, Long> {
 

@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class AppleUserInfo {
+
     private String email;
     private String name;
     private String sub; // Apple's unique identifier
