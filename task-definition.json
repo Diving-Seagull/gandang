@@ -1,26 +1,22 @@
 {
   "family": "gandang",
   "networkMode": "awsvpc",
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
+  "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
+  "executionRoleArn": "arn:aws:iam::010928195927:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "gandang-container",
-      "image": "<ECR_URI>",
-      "cpu": 256,
-      "memory": 512,
+      "image": "010928195927.dkr.ecr.ap-northeast-2.amazonaws.com/gandang",
       "portMappings": [
         {
-          "containerPort": 3000,
-          "hostPort": 3000,
+          "containerPort": 8080,
+          "hostPort": 8080,
           "protocol": "tcp"
         }
       ],
       "essential": true,
-      "environment": [],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
@@ -30,6 +26,5 @@
         }
       }
     }
-  ],
-  "executionRoleArn": "arn:aws:iam::010928195927:role/ecsTaskExecutionRole"
+  ]
 }
