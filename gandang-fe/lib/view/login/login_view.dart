@@ -204,7 +204,7 @@ class LoginView extends ConsumerWidget {
             var data = TokenDto(login.identityToken!, firebase_token!);
             var result = await _viewModel.setLogin(data, 'apple');
             if(result != null) {
-              print('Apple 로그인 정보 $result');
+              print('Apple 로그인 정보 ${result.token}');
               await prefer.setString('jwtToken', result.token);
               _moveMainScreen(context);
             }
