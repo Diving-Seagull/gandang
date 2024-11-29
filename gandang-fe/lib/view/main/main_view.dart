@@ -25,25 +25,20 @@ class MainView extends ConsumerStatefulWidget{
 class _MainView extends ConsumerState<MainView> {
   // NaverMapController 객체의 비동기 작업 완료를 나타내는 Completer 생성
   final Completer<NaverMapController> mapControllerCompleter = Completer();
+  late NOverlayImage _customMarkerImage;
   StreamSubscription<Position>? _positionStream;
   late NaverMapController _mapController;
-  late NOverlayImage _customMarkerImage;
   late NMarker user_marker;
   late Position position;
 
   @override
   void initState() {
     super.initState();
-    _customMarkerImage = const NOverlayImage.fromAssetImage('assets/images/orange-now.png');
+    _customMarkerImage = NOverlayImage.fromAssetImage('assets/images/orange-now.png');
     user_marker = NMarker(id: DateTime.now().toIso8601String(),
         position: NLatLng(0, 0),
         icon: _customMarkerImage
     );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startListeningToLocationChanges();
-      setNowLocation();
-    });
   }
 
   /// 위치 변화 감지 시작
@@ -63,6 +58,8 @@ class _MainView extends ConsumerState<MainView> {
       this.position = position;
       _addMarker();
     });
+
+    setNowLocation();
   }
 
   void setNowLocation() async {
@@ -299,17 +296,19 @@ class _MainView extends ConsumerState<MainView> {
         locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
         consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
       ),
-      onMapReady: (controller) async {
+      onMapReady: (controller) {
         _mapController = controller;
+        _mapController.addOverlay(user_marker);
         mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
+        _startListeningToLocationChanges();
         print("onMapReady");
-        setNowLocation();
       },
     );
   }
 
   void _addMarker() {
     user_marker.setPosition(NLatLng(position.latitude, position.longitude));
+    _moveCameraTo();
   }
 
   void _moveCameraTo() {

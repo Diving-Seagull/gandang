@@ -24,7 +24,6 @@ class LoginDataSource {
       final int statusCode = response.statusCode;
 
       if(statusCode == 200){
-        print(1);
         return JwtData.fromJson(json.decode(utf8.decode(response.bodyBytes)));
       }
       else {
