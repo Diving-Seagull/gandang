@@ -10,7 +10,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gandang/data/global/device_size.dart';
 import 'package:gandang/view/global/color_data.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../data/global/location_service.dart';
 
 class MainView extends ConsumerStatefulWidget{
   const MainView({super.key});
@@ -22,10 +25,42 @@ class MainView extends ConsumerStatefulWidget{
 class _MainView extends ConsumerState<MainView> {
   // NaverMapController 객체의 비동기 작업 완료를 나타내는 Completer 생성
   final Completer<NaverMapController> mapControllerCompleter = Completer();
+  StreamSubscription<Position>? _positionStream;
+  late NaverMapController _mapController;
+  late NOverlayImage _customMarkerImage;
 
   @override
   void initState() {
     super.initState();
+    _startListeningToLocationChanges();
+  }
+
+  /// 위치 변화 감지 시작
+  void _startListeningToLocationChanges() async {
+    _customMarkerImage = await NOverlayImage.fromAssetImage('assets/images/orange-now.png');
+    // 권한 확인 및 요청
+    final hasPermission = await LocationService.requestLocationPermission();
+    if (!hasPermission) {
+      return;
+    }
+    // 위치 변화 스트림 설정
+    _positionStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10, // 최소 이동 거리(미터)
+      ),
+    ).listen((Position position) {
+      final newLocation = NLatLng(position.latitude, position.longitude);
+      _addMarker(newLocation);
+      _moveCameraTo(newLocation);
+    });
+  }
+
+  void setNowLocation() async {
+    var loc = await Geolocator.getCurrentPosition();
+    var nloc = NLatLng(loc.latitude, loc.longitude);
+    _addMarker(nloc);
+    _moveCameraTo(nloc);
   }
 
   @override
@@ -89,7 +124,7 @@ class _MainView extends ConsumerState<MainView> {
                                         style: ElevatedButton.styleFrom(
                                           padding: EdgeInsets.all(0),
                                         ),
-                                        child: Text('My >',
+                                        child: const Text('My >',
                                           style: TextStyle(
                                             color: ColorData.COLOR_WHITE
                                           ),
@@ -158,7 +193,9 @@ class _MainView extends ConsumerState<MainView> {
                                 color: ColorData.COLOR_WHITE,
                                 borderRadius: BorderRadius.circular(1000),
                                 elevation: 5,
-                                child: IconButton(onPressed: (){},
+                                child: IconButton(onPressed: (){
+                                  setNowLocation();
+                                },
                                     icon: SvgPicture.asset('assets/images/loc-icon.svg')
                                 ),
                               )
@@ -229,10 +266,27 @@ class _MainView extends ConsumerState<MainView> {
         locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
         consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
       ),
-      onMapReady: (controller) async {                // 지도 준비 완료 시 호출되는 콜백 함수
+      onMapReady: (controller) async {
+        _mapController = controller;
         mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
         log("onMapReady", name: "onMapReady");
       },
     );
+  }
+
+  void _addMarker(NLatLng position) {
+    final marker = NMarker(
+      id: DateTime.now().toIso8601String(), // 고유 ID
+      position: position,
+      icon: _customMarkerImage
+    );
+    setState(() {
+      _mapController.clearOverlays();
+      _mapController.addOverlay(marker);
+    });
+  }
+
+  void _moveCameraTo(NLatLng position) {
+    _mapController.updateCamera(NCameraUpdate.scrollAndZoomTo(target: position, zoom: 15,));
   }
 }
