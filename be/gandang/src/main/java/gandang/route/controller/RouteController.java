@@ -41,7 +41,8 @@ public class RouteController {
     public ResponseEntity<Page<RouteResponseDto>> getStarredRoutes(
         @LoginMember Member member,
         @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<RouteResponseDto> starredRoutes = routeService.getStarredRoutes(member.getEmail(), pageable);
+        Page<RouteResponseDto> starredRoutes = routeService.getStarredRoutes(member.getEmail(),
+            pageable);
         return ResponseEntity.ok(starredRoutes);
     }
 

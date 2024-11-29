@@ -10,6 +10,7 @@ import lombok.Getter;
 @Builder
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class RouteStarResponseDto {
+
     private Long routeId;
     private Long starId;
     private LocalDateTime starredAt;
