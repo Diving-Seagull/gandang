@@ -5,8 +5,10 @@ import static gandang.common.exception.ExceptionCode.ROUTE_NOT_FOUND;
 import static gandang.common.exception.ExceptionCode.ROUTE_STAR_NOT_FOUND;
 
 import gandang.common.exception.CustomException;
+import gandang.common.utils.AddressParser;
 import gandang.member.entity.Member;
 import gandang.member.service.MemberService;
+import gandang.route.dto.PopularDestinationDto;
 import gandang.route.dto.RouteRequestDto;
 import gandang.route.dto.RouteResponseDto;
 import gandang.route.dto.RouteStarResponseDto;
@@ -15,8 +17,10 @@ import gandang.route.entity.RouteStar;
 import gandang.route.repository.RouteRepository;
 import gandang.route.repository.RouteStarRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +79,17 @@ public class RouteService {
             .createdAt(route.getCreatedAt())
             .isStarred(true)
             .build());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PopularDestinationDto> getRecommendedRoutes(String currentAddress) {
+        AddressParser.AddressComponents components = AddressParser.parse(currentAddress);
+        String searchArea = components.getDistrict();
+
+        return routeRepository.findPopularDestinations(
+            searchArea,
+            PageRequest.of(0, 10)
+        );
     }
 
     @Transactional

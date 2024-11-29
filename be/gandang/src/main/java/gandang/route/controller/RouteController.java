@@ -2,11 +2,13 @@ package gandang.route.controller;
 
 import gandang.auth.LoginMember;
 import gandang.member.entity.Member;
+import gandang.route.dto.PopularDestinationDto;
 import gandang.route.dto.RouteRequestDto;
 import gandang.route.dto.RouteResponseDto;
 import gandang.route.dto.RouteStarResponseDto;
 import gandang.route.service.RouteService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,6 +47,14 @@ public class RouteController {
         Page<RouteResponseDto> starredRoutes = routeService.getStarredRoutes(member.getEmail(),
             pageable);
         return ResponseEntity.ok(starredRoutes);
+    }
+
+    @GetMapping("/recommendations")
+    public ResponseEntity<List<PopularDestinationDto>> getRecommendedRoutes(
+        @RequestParam String currentAddress) {
+        List<PopularDestinationDto> recommendations = routeService.getRecommendedRoutes(
+            currentAddress);
+        return ResponseEntity.ok(recommendations);
     }
 
     @PostMapping
