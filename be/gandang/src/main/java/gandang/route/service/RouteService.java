@@ -6,7 +6,6 @@ import static gandang.common.exception.ExceptionCode.ROUTE_STAR_NOT_FOUND;
 
 import gandang.common.exception.CustomException;
 import gandang.member.entity.Member;
-import gandang.member.repository.MemberRepository;
 import gandang.member.service.MemberService;
 import gandang.route.dto.RouteRequestDto;
 import gandang.route.dto.RouteResponseDto;
