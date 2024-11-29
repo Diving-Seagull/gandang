@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +16,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../data/global/google_login_api.dart';
 import '../../data/global/kakao_login_api.dart';
+import '../main/main_view.dart';
 
 class LoginView extends ConsumerWidget {
   LoginView({super.key});
@@ -118,6 +120,8 @@ class LoginView extends ConsumerWidget {
             var result = await _viewModel.setLogin(data, 'kakao');
             if(result != null) {
               print('카카오 로그인 정보 $result');
+              await prefer.setString('jwtToken', result.token);
+              _moveMainScreen(context);
             }
           }
         },
@@ -159,6 +163,8 @@ class LoginView extends ConsumerWidget {
                   var result = await _viewModel.setLogin(data, 'google');
                   if(result != null) {
                     print('구글 로그인 정보 $result');
+                    await prefer.setString('jwtToken', result.token);
+                    _moveMainScreen(context);
                   }
               }
             },
@@ -199,6 +205,8 @@ class LoginView extends ConsumerWidget {
             var result = await _viewModel.setLogin(data, 'apple');
             if(result != null) {
               print('Apple 로그인 정보 $result');
+              await prefer.setString('jwtToken', result.token);
+              _moveMainScreen(context);
             }
           }
         },
@@ -220,4 +228,12 @@ class LoginView extends ConsumerWidget {
       ),
       )
   );
+
+  void _moveMainScreen(BuildContext context) {
+    if(context.mounted) {
+      Navigator.pop(context); //Splash 화면 제거
+      Navigator.push(
+          context, CupertinoPageRoute(builder: (context) => MainView()));
+    }
+  }
 }

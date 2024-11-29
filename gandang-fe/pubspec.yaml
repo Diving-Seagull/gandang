@@ -48,6 +48,7 @@ dependencies:
   sign_in_with_apple: ^6.1.3
   flutter_naver_map: ^1.3.0+1
   http: ^1.2.2
+  flutter_svg: ^2.0.16
 
 dev_dependencies:
   flutter_test:
