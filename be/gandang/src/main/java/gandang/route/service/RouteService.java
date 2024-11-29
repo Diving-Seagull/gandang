@@ -48,8 +48,11 @@ public class RouteService {
             .id(route.getId())
             .startLatitude(route.getStartLatitude())
             .startLongitude(route.getStartLongitude())
+            .startAddress(route.getStartAddress())
             .endLatitude(route.getEndLatitude())
             .endLongitude(route.getEndLongitude())
+            .endAddress(route.getEndAddress())
+            .distance(route.getDistance())
             .createdAt(route.getCreatedAt())
             .isStarred(starredRouteIds.contains(route.getId()))
             .build());
@@ -71,7 +74,7 @@ public class RouteService {
             .endAddress(route.getEndAddress())
             .distance(route.getDistance())
             .createdAt(route.getCreatedAt())
-            .isStarred(true) // 즐겨찾기 목록이므로 항상 true
+            .isStarred(true)
             .build());
     }
 
@@ -83,8 +86,11 @@ public class RouteService {
             .member(member)
             .startLatitude(requestDto.getStartLatitude())
             .startLongitude(requestDto.getStartLongitude())
+            .startAddress(requestDto.getStartAddress())
             .endLatitude(requestDto.getEndLatitude())
             .endLongitude(requestDto.getEndLongitude())
+            .endAddress(requestDto.getEndAddress())
+            .distance(requestDto.getDistance())
             .build();
 
         Route savedRoute = routeRepository.save(route);
@@ -93,9 +99,13 @@ public class RouteService {
             .id(savedRoute.getId())
             .startLatitude(savedRoute.getStartLatitude())
             .startLongitude(savedRoute.getStartLongitude())
+            .startAddress(savedRoute.getStartAddress())
             .endLatitude(savedRoute.getEndLatitude())
             .endLongitude(savedRoute.getEndLongitude())
+            .endAddress(savedRoute.getEndAddress())
+            .distance(savedRoute.getDistance())
             .createdAt(savedRoute.getCreatedAt())
+            .isStarred(false)
             .build();
     }
 

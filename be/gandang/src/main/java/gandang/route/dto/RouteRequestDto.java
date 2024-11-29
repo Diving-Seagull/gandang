@@ -26,4 +26,7 @@ public class RouteRequestDto {
 
     @NotNull(message = "도착지 주소지를 입력해주세요")
     private String endAddress;
+
+    @NotNull(message = "이동 거리를 입력해주세요")
+    private Double distance;
 }
