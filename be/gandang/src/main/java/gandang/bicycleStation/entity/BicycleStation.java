@@ -1,4 +1,4 @@
-package gandang.pm.entity;
+package gandang.bicycleStation.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

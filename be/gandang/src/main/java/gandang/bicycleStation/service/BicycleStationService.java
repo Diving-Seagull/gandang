@@ -1,8 +1,8 @@
-package gandang.pm.service;
+package gandang.bicycleStation.service;
 
-import gandang.pm.dto.NearestBicycleStationResponseDto;
-import gandang.pm.entity.BicycleStation;
-import gandang.pm.repository.BicycleStationRepository;
+import gandang.bicycleStation.dto.NearestBicycleStationResponseDto;
+import gandang.bicycleStation.entity.BicycleStation;
+import gandang.bicycleStation.repository.BicycleStationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
