@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:developer';
 
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +8,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gandang/data/global/device_size.dart';
 import 'package:gandang/view/global/color_data.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/global/location_service.dart';
 
@@ -28,16 +24,25 @@ class _MainView extends ConsumerState<MainView> {
   StreamSubscription<Position>? _positionStream;
   late NaverMapController _mapController;
   late NOverlayImage _customMarkerImage;
+  late NMarker user_marker;
+  late Position position;
 
   @override
   void initState() {
     super.initState();
-    _startListeningToLocationChanges();
+    _customMarkerImage = const NOverlayImage.fromAssetImage('assets/images/orange-now.png');
+    user_marker = NMarker(id: DateTime.now().toIso8601String(),
+        position: NLatLng(0, 0),
+        icon: _customMarkerImage
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startListeningToLocationChanges();
+    });
   }
 
   /// 위치 변화 감지 시작
   void _startListeningToLocationChanges() async {
-    _customMarkerImage = await NOverlayImage.fromAssetImage('assets/images/orange-now.png');
     // 권한 확인 및 요청
     final hasPermission = await LocationService.requestLocationPermission();
     if (!hasPermission) {
@@ -50,17 +55,14 @@ class _MainView extends ConsumerState<MainView> {
         distanceFilter: 10, // 최소 이동 거리(미터)
       ),
     ).listen((Position position) {
-      final newLocation = NLatLng(position.latitude, position.longitude);
-      _addMarker(newLocation);
-      _moveCameraTo(newLocation);
+      this.position = position;
+      _addMarker();
     });
   }
 
   void setNowLocation() async {
-    var loc = await Geolocator.getCurrentPosition();
-    var nloc = NLatLng(loc.latitude, loc.longitude);
-    _addMarker(nloc);
-    _moveCameraTo(nloc);
+    position = await Geolocator.getCurrentPosition();
+    _addMarker();
   }
 
   @override
@@ -107,6 +109,18 @@ class _MainView extends ConsumerState<MainView> {
                                     isDense: true,
                                     contentPadding: const EdgeInsets.all(10)
                                 ),
+                                readOnly: true,
+                                onTap: () {
+                                  // 애니메이션 없이 이동
+                                  Navigator.pushReplacement(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder: (context, animation1, animation2) => SearchView(),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
+                                },
                               ),
                             )),
                             Flexible(flex: 1,
@@ -195,6 +209,7 @@ class _MainView extends ConsumerState<MainView> {
                                 elevation: 5,
                                 child: IconButton(onPressed: (){
                                   setNowLocation();
+                                  _moveCameraTo();
                                 },
                                     icon: SvgPicture.asset('assets/images/loc-icon.svg')
                                 ),
@@ -269,24 +284,18 @@ class _MainView extends ConsumerState<MainView> {
       onMapReady: (controller) async {
         _mapController = controller;
         mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
-        log("onMapReady", name: "onMapReady");
+        print("onMapReady");
       },
     );
   }
 
-  void _addMarker(NLatLng position) {
-    final marker = NMarker(
-      id: DateTime.now().toIso8601String(), // 고유 ID
-      position: position,
-      icon: _customMarkerImage
-    );
-    setState(() {
-      _mapController.clearOverlays();
-      _mapController.addOverlay(marker);
-    });
+  void _addMarker() {
+    user_marker.setPosition(NLatLng(position.latitude, position.longitude));
   }
 
-  void _moveCameraTo(NLatLng position) {
-    _mapController.updateCamera(NCameraUpdate.scrollAndZoomTo(target: position, zoom: 15,));
+  void _moveCameraTo() {
+    _mapController.updateCamera(
+        NCameraUpdate.scrollAndZoomTo(
+          target: NLatLng(position.latitude, position.longitude), zoom: 15,));
   }
 }
