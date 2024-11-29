@@ -277,8 +277,8 @@ class _SearchView extends ConsumerState<SearchView> {
 
       if(start_address != null && end_address != null) {
         var info = SearchedInfo(
-            start_address.address_name, start_address.y, start_address.x,
-            end_address.address_name, end_address.y, end_address.x, start, finish);
+            start_address.address_name, start_address.x, start_address.y,
+            end_address.address_name, end_address.x, end_address.y, start, finish);
         // 애니메이션 없이 이동
         Navigator.push(
             context,

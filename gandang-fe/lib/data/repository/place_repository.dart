@@ -1,5 +1,7 @@
+import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:gandang/data/login/place_datasource.dart';
 import 'package:gandang/data/model/query_detail.dart';
+import 'package:gandang/data/model/road_search_info.dart';
 import 'package:gandang/data/model/station_dto.dart';
 import 'package:gandang/data/model/token_dto.dart';
 
@@ -23,6 +25,15 @@ class PlaceRepository  {
       return result;
     } catch (e) {
       throw Exception('Failed to getBicycleStation from repository: $e');
+    }
+  }
+
+  Future<List<NLatLng>> getWalkingRoute(RoadSearchInfo searchInfo) async {
+    try{
+      var routePoints = await placeDataSource.getWalkingRoute(searchInfo);
+      return routePoints;
+    }catch(e) {
+      throw Exception('Failed to road route $e');
     }
   }
 }

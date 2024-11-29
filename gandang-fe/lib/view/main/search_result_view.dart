@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:gandang/data/model/road_search_info.dart';
 import 'package:gandang/data/model/searched_info.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -280,12 +282,11 @@ class _SearchResultView extends ConsumerState<SearchResultView>
         indoorEnable: false,             // 실내 맵 사용 가능 여부 설정
         locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
         consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
-        mapType: NMapType.navi
       ),
       onMapReady: (controller) async {
         _mapController = controller;
         _mapController.addOverlay(user_marker);
-        _mapController.addOverlay(NPathOverlay(id: 'id', coords: tmpPath));
+        // _mapController.addOverlay(NPathOverlay(id: 'id', coords: tmpPath));
         mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
         print("onMapReady");
         setNowLocation(true);
@@ -309,12 +310,12 @@ class _SearchResultView extends ConsumerState<SearchResultView>
     await setNowLocation(false).then((onValue) async {
       var prefer = await SharedPreferences.getInstance();
       var token = prefer.getString('jwtToken')!;
-      var startLoc =
+      var startBicycleLoc =
           await _placeViewModel.getBicycleStation(position.latitude, position.longitude, TokenDto(token));
-      var endLoc =
+      var endBicycleLoc =
           await _placeViewModel.getBicycleStation(info.end_latitude, info.end_longitude, TokenDto(token));
-      if(startLoc != null && endLoc != null) {
-        print('호출 완료');
+      if(startBicycleLoc != null && endBicycleLoc != null) {
+        _mapController.deleteOverlay(NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicyclePath'));
         if(_selectedIndex == 0) {
           var _destImage = const NOverlayImage.fromAssetImage('assets/images/orange-dest-logo.png');
           _mapController.addOverlay(
@@ -323,6 +324,26 @@ class _SearchResultView extends ConsumerState<SearchResultView>
                   icon: _destImage,
                   position: NLatLng(info.end_latitude, info.end_longitude,
                   )));
+
+          RoadSearchInfo startInfo =
+            RoadSearchInfo(startName: base64Encode(utf8.encode(startBicycleLoc.address)), startX: startBicycleLoc.longitude, startY: startBicycleLoc.latitude,
+                endName: base64Encode(utf8.encode(info.start_address)), endX: info.start_longitude, endY: info.start_latitude);
+          var startRoadData = await _placeViewModel.getWalkingRoute(startInfo);
+
+          RoadSearchInfo endInfo =
+          RoadSearchInfo(startName: base64Encode(utf8.encode(endBicycleLoc.address)), startX: endBicycleLoc.longitude, startY: endBicycleLoc.latitude,
+              endName: base64Encode(utf8.encode(info.end_address)), endX: info.end_longitude, endY: info.end_latitude);
+          var endRoadData = await _placeViewModel.getWalkingRoute(endInfo);
+
+          _mapController.addOverlay(NPathOverlay(id: 'bicycle-start', coords: startRoadData, color: ColorData.CONTENTS_050));
+          _mapController.addOverlay(NPathOverlay(id: 'bicycle-end', coords: endRoadData, color: ColorData.CONTENTS_300));
+
+          //TODO :: 백엔드에서 경로 받아와야 함
+          List<NLatLng> rideList = [
+            NLatLng(info.start_latitude, info.start_longitude),
+            NLatLng(endBicycleLoc.latitude, endBicycleLoc.longitude)
+          ];
+          _mapController.addOverlay(NPathOverlay(id: 'bicycle-between', coords: rideList, color: ColorData.PRIMARY_COLOR));
         }
       }
     });
