@@ -307,5 +307,8 @@ class _SearchView extends ConsumerState<SearchView> {
           reverseTransitionDuration: const Duration(microseconds: 300),
         ).pageBuilder)
     );
+    // TODO: 선택한 데이터의 출발지 목적지 장소 텍스트 초기화
+    startController.text = '';
+    finishController.text = '';
   }
 }

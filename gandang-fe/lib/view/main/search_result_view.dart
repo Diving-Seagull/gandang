@@ -38,7 +38,7 @@ class _SearchResultView extends ConsumerState<SearchResultView>
   final TextEditingController startController = TextEditingController(),
       finishController = TextEditingController();
   final PlaceViewModel _placeViewModel = PlaceViewModel();
-  final SearchedInfo info;
+  late SearchedInfo info;
   final List<NLatLng> tmpPath = [
     NLatLng(33.4611246,126.9333801),
     NLatLng(33.4610729,126.9332102),
@@ -136,15 +136,16 @@ class _SearchResultView extends ConsumerState<SearchResultView>
       ),
     ).listen((Position position) {
       this.position = position;
-      _addMarker();
     });
   }
 
   Future<void> setNowLocation(bool isMap) async {
-    position = await Geolocator.getCurrentPosition();
-    if(isMap) {
-      _addMarker();
-    }
+    await Geolocator.getCurrentPosition().then((value){
+      position = value;
+      if(isMap) {
+        _addMarker();
+      }
+    });
   }
 
   @override
@@ -289,7 +290,7 @@ class _SearchResultView extends ConsumerState<SearchResultView>
         // _mapController.addOverlay(NPathOverlay(id: 'id', coords: tmpPath));
         mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
         print("onMapReady");
-        setNowLocation(true);
+        await setNowLocation(true);
         getRecentRideLoc();
       },
     );
@@ -315,7 +316,9 @@ class _SearchResultView extends ConsumerState<SearchResultView>
       var endBicycleLoc =
           await _placeViewModel.getBicycleStation(info.end_latitude, info.end_longitude, TokenDto(token));
       if(startBicycleLoc != null && endBicycleLoc != null) {
-        _mapController.deleteOverlay(NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicyclePath'));
+        _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-start'));
+        _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-between'));
+        _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-end'));
         if(_selectedIndex == 0) {
           var _destImage = const NOverlayImage.fromAssetImage('assets/images/orange-dest-logo.png');
           _mapController.addOverlay(
@@ -324,12 +327,10 @@ class _SearchResultView extends ConsumerState<SearchResultView>
                   icon: _destImage,
                   position: NLatLng(info.end_latitude, info.end_longitude,
                   )));
-
           RoadSearchInfo startInfo =
-            RoadSearchInfo(startName: base64Encode(utf8.encode(startBicycleLoc.address)), startX: startBicycleLoc.longitude, startY: startBicycleLoc.latitude,
-                endName: base64Encode(utf8.encode(info.start_address)), endX: info.start_longitude, endY: info.start_latitude);
+            RoadSearchInfo(startName: base64Encode(utf8.encode('a')), startX: position.longitude, startY: position.latitude,
+                endName: base64Encode(utf8.encode(startBicycleLoc.address)), endX: startBicycleLoc.longitude, endY: startBicycleLoc.latitude);
           var startRoadData = await _placeViewModel.getWalkingRoute(startInfo);
-
           RoadSearchInfo endInfo =
           RoadSearchInfo(startName: base64Encode(utf8.encode(endBicycleLoc.address)), startX: endBicycleLoc.longitude, startY: endBicycleLoc.latitude,
               endName: base64Encode(utf8.encode(info.end_address)), endX: info.end_longitude, endY: info.end_latitude);
@@ -340,8 +341,8 @@ class _SearchResultView extends ConsumerState<SearchResultView>
 
           //TODO :: 백엔드에서 경로 받아와야 함
           List<NLatLng> rideList = [
-            NLatLng(info.start_latitude, info.start_longitude),
-            NLatLng(endBicycleLoc.latitude, endBicycleLoc.longitude)
+            startRoadData.last,
+            endRoadData.first
           ];
           _mapController.addOverlay(NPathOverlay(id: 'bicycle-between', coords: rideList, color: ColorData.PRIMARY_COLOR));
         }
@@ -459,6 +460,12 @@ class _SearchResultView extends ConsumerState<SearchResultView>
       var start_address = await _placeViewModel.getLatLngtoQuery(start);
       var end_address = await _placeViewModel.getLatLngtoQuery(finish);
 
+      if(start_address != null && end_address != null) {
+        info = SearchedInfo(
+            start_address.address_name, start_address.x, start_address.y,
+            end_address.address_name, end_address.x, end_address.y, start, finish);
+        getRecentRideLoc();
+      }
     } catch(e) {
       print(e);
     }
