@@ -18,6 +18,9 @@ public class RouteRequestDto {
     @NotNull(message = "출발지 주소지를 입력해주세요")
     private String startAddress;
 
+    @NotNull(message = "출발지 이름을 입력해주세요")
+    private String startName;
+
     @NotNull(message = "도착지 위도를 입력해주세요")
     private Double endLatitude;
 
@@ -27,6 +30,6 @@ public class RouteRequestDto {
     @NotNull(message = "도착지 주소지를 입력해주세요")
     private String endAddress;
 
-    @NotNull(message = "이동 거리를 입력해주세요")
-    private Double distance;
+    @NotNull(message = "도착지 이름을 입력해주세요")
+    private String endName;
 }
