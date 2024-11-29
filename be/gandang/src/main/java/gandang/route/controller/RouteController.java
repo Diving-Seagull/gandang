@@ -37,6 +37,14 @@ public class RouteController {
         return ResponseEntity.ok(routes);
     }
 
+    @GetMapping("/stars")
+    public ResponseEntity<Page<RouteResponseDto>> getStarredRoutes(
+        @LoginMember Member member,
+        @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<RouteResponseDto> starredRoutes = routeService.getStarredRoutes(member.getEmail(), pageable);
+        return ResponseEntity.ok(starredRoutes);
+    }
+
     @PostMapping
     public ResponseEntity<RouteResponseDto> createRoute(@LoginMember Member member,
         @Valid @RequestBody RouteRequestDto requestDto) {

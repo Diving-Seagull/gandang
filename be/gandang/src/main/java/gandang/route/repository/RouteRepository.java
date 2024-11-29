@@ -21,4 +21,7 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
         @Param("starredIds") List<Long> starredIds,
         Pageable pageable
     );
+
+    @Query("SELECT r FROM Route r JOIN r.routeStars rs WHERE rs.member = :member")
+    Page<Route> findAllByRouteStarsMember(@Param("member") Member member, Pageable pageable);
 }

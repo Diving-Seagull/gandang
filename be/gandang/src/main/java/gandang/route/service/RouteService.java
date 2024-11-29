@@ -55,6 +55,26 @@ public class RouteService {
             .build());
     }
 
+    @Transactional(readOnly = true)
+    public Page<RouteResponseDto> getStarredRoutes(String email, Pageable pageable) {
+        Member member = memberService.getMemberEntityByEmail(email);
+
+        Page<Route> starredRoutes = routeRepository.findAllByRouteStarsMember(member, pageable);
+
+        return starredRoutes.map(route -> RouteResponseDto.builder()
+            .id(route.getId())
+            .startLatitude(route.getStartLatitude())
+            .startLongitude(route.getStartLongitude())
+            .startAddress(route.getStartAddress())
+            .endLatitude(route.getEndLatitude())
+            .endLongitude(route.getEndLongitude())
+            .endAddress(route.getEndAddress())
+            .distance(route.getDistance())
+            .createdAt(route.getCreatedAt())
+            .isStarred(true) // 즐겨찾기 목록이므로 항상 true
+            .build());
+    }
+
     @Transactional
     public RouteResponseDto createRoute(String email, RouteRequestDto requestDto) {
         Member member = memberService.getMemberEntityByEmail(email);
