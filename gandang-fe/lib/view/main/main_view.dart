@@ -39,6 +39,7 @@ class _MainView extends ConsumerState<MainView> {
   late NaverMapController _mapController;
   late NMarker user_marker;
   late Position position;
+  ScrollController? scrollController;
 
   final recommendProvider = FutureProvider.family<List<RecommendDto>, String>((ref, str) async {
     try {
@@ -90,7 +91,8 @@ class _MainView extends ConsumerState<MainView> {
   Future<String?> getLocation() async {
     var pos = await Geolocator.getCurrentPosition();
     var repository = ref.read(placeRepositoryProvider);
-    return await repository.getAddressFromCoordinates(pos.latitude, pos.longitude);
+    return await repository.getAddressFromCoordinates(
+        pos.latitude, pos.longitude);
   }
 
   @override
@@ -139,28 +141,15 @@ class _MainView extends ConsumerState<MainView> {
                                 ),
                                 readOnly: true,
                                 onTap: () {
-                                  if(Platform.isAndroid) {
-                                    // 애니메이션 없이 이동
-                                    Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          pageBuilder: (context, animation1, animation2) => SearchView(),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration: const Duration(microseconds: 300),
-                                        )
-                                    );
-                                  }
-                                  else {
-                                    // 애니메이션 없이 이동
-                                    Navigator.push(
-                                        context,
-                                        NoAnimationRoute(pageBuilder: PageRouteBuilder(
-                                          pageBuilder: (context, animation1, animation2) => SearchView(),
-                                          transitionDuration: Duration.zero,
-                                          reverseTransitionDuration: const Duration(microseconds: 300),
-                                        ).pageBuilder)
-                                    );
-                                  }
+                                  // 애니메이션 없이 이동
+                                  Navigator.push(
+                                      context,
+                                      NoAnimationRoute(pageBuilder: PageRouteBuilder(
+                                        pageBuilder: (context, animation1, animation2) => SearchView(),
+                                        transitionDuration: Duration.zero,
+                                        reverseTransitionDuration: const Duration(microseconds: 300),
+                                      ).pageBuilder)
+                                  );
                                 },
                               ),
                             )),
@@ -263,10 +252,11 @@ class _MainView extends ConsumerState<MainView> {
                 ),
               ),
               DraggableScrollableSheet(
-                  initialChildSize: 0.1, // 초기 높이
-                  minChildSize: 0.1, // 최소 높이
+                  initialChildSize: 0.2, // 초기 높이
+                  minChildSize: 0.2, // 최소 높이
                   maxChildSize: 0.6, // 최대 높이
                   builder: (BuildContext context, ScrollController scrollController) {
+                    this.scrollController = scrollController;
                     return Container(
                         decoration: const BoxDecoration(
                             color: Colors.white,
@@ -293,111 +283,7 @@ class _MainView extends ConsumerState<MainView> {
                                 ),
                               ),
                             ),
-                            FutureBuilder(future: getLocation(), builder: (context, result) {
-                              if (result.hasData) {
-                                var watch = ref.watch(
-                                    recommendProvider(result.requireData!));
-                                return watch.when(data: (dataList) {
-                                  return Expanded(
-                                    child: ListView.builder(
-                                      controller: scrollController,
-                                      itemCount: dataList.length,
-                                      itemBuilder: (BuildContext context,
-                                          int index) {
-                                        var addressList = dataList[index]
-                                            .end_address.split(' ');
-                                        var addr = '${addressList[2]}';
-                                        var result_addr = addressList.skip(2).join(' ');
-                                        return Padding(
-                                          padding: EdgeInsets.all(25),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment
-                                                .center,
-                                            crossAxisAlignment: CrossAxisAlignment
-                                                .start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(addr,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 22,
-                                                    color: ColorData.PRIMARY_COLOR
-                                                    ),
-                                                  ),
-                                                  const Text(' 근처 코스를',
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 22
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                              const Text('찾고 계신가요?',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 22,
-                                                  color: ColorData.CONTENTS_300
-                                                ),
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Row(
-                                                children: [
-                                                  Text('${dataList[index].visit_count}명',
-                                                    style: const TextStyle(
-                                                        color: ColorData.PRIMARY_COLOR,
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.bold
-                                                    ),
-                                                  ),
-                                                  const Text('이 이곳을 선택했어요!')
-                                                ],
-                                              ),
-                                              const SizedBox(height: 10),
-                                              Container(height: 80, padding: EdgeInsets.symmetric(vertical: 10), child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  Expanded(flex: 1, child: SvgPicture.asset('assets/images/thumb-up.svg')),
-                                                  Expanded(flex: 1, child: PathPaint.instance.getPathWidget(10)),
-                                                  Expanded(flex: 6, child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(result_addr ,
-                                                        style: const TextStyle(
-                                                            overflow: TextOverflow.ellipsis,
-                                                        ),
-                                                      ),
-                                                      Text(result.requireData!.split(' ').skip(2).join(' '),
-                                                        style: const TextStyle(
-                                                            overflow: TextOverflow.ellipsis
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ))
-                                                ]
-                                              )),
-                                              const SizedBox(height: 10),
-                                              _destDetailSection(result.requireData!, dataList[index])
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
-                                }, error: (error, stack) {
-                                  return Center(child: Text('에러 발생'));
-                                }, loading: () {
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                });
-                              }
-                              else{
-                                return Center(child: Text('추천 경로가 없습니다.'));
-                              }
-                            }
-                            )
+                            _nearRouteSection()
                           ],
                         )
                     );
@@ -409,8 +295,117 @@ class _MainView extends ConsumerState<MainView> {
     );
   }
 
+  Widget _nearRouteSection() {
+    return FutureBuilder(future: getLocation(), builder: (context, result) {
+      if (result.hasData) {
+        var watch = ref.watch(
+            recommendProvider(result.requireData!));
+        return watch.when(data: (dataList) {
+          return Expanded(
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: dataList.length > 0 ? 1 : 0,
+              itemBuilder: (BuildContext context,
+                  int index) {
+                var addressList = dataList[index]
+                    .end_address.split(' ');
+                var addr = '${addressList[2]}';
+                var start_addr = result.requireData!.split(' ').skip(2).join(' ');
+                var result_addr = addressList.skip(2).join(' ');
+                return Padding(
+                  padding: EdgeInsets.all(25),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment
+                        .center,
+                    crossAxisAlignment: CrossAxisAlignment
+                        .start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(result.requireData!.split(' ')[2],
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22,
+                                color: ColorData.PRIMARY_COLOR
+                            ),
+                          ),
+                          const Text(' 근처 코스를',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22
+                            ),
+                          )
+                        ],
+                      ),
+                      const Text('찾고 계신가요?',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                            color: ColorData.CONTENTS_300
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Text('${dataList[index].visit_count}명',
+                            style: const TextStyle(
+                                color: ColorData.PRIMARY_COLOR,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                          const Text('이 이곳을 선택했어요!')
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Container(height: 80, padding: EdgeInsets.symmetric(vertical: 10), child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(flex: 1, child: SvgPicture.asset('assets/images/thumb-up.svg')),
+                            Expanded(flex: 1, child: PathPaint.instance.getPathWidget(10)),
+                            Expanded(flex: 6, child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(start_addr ,
+                                  style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Text(result_addr,
+                                  style: const TextStyle(
+                                      overflow: TextOverflow.ellipsis
+                                  ),
+                                ),
+                              ],
+                            ))
+                          ]
+                      )),
+                      const SizedBox(height: 10),
+                      _destDetailSection(result.requireData!, dataList[index])
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        }, error: (error, stack) {
+          return Center(child: Text('에러 발생'));
+        }, loading: () {
+          return Center(
+              child: CircularProgressIndicator());
+        });
+      }
+      else{
+        return Center(child: Text('추천 경로가 없습니다.'));
+      }
+    }
+    );
+  }
+
   Widget _destDetailSection(String start_addr, RecommendDto endData) {
-    var time = ConvertTime.instance.convertDecimalToTime(20 / endData.distance);
+    var time = ConvertTime.instance.convertDecimalToTime(endData.distance / 20);
     return Container(
       width: DeviceSize.getWidth(context),
       height: 175,
