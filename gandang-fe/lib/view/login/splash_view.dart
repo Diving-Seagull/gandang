@@ -4,12 +4,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gandang/view/login/login_view.dart';
 import 'package:gandang/view/main/main_view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../data/global/google_login_api.dart';
 import '../../data/global/kakao_login_api.dart';
+import '../global/color_data.dart';
 
 class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
@@ -95,13 +97,13 @@ class _SplashViewState extends ConsumerState<SplashView> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
+        backgroundColor: ColorData.PRIMARY_COLOR,
         body: Center(
           child: Container(
-            height: double.infinity, // 너비 꽉 채우기
-            width: double.infinity, // 높이 꽉 채우기
             decoration: const BoxDecoration(
-              color: Color.fromARGB(255, 28, 72, 161),
+              color: ColorData.PRIMARY_COLOR,
             ),
+            child: SvgPicture.asset('assets/images/splash-logo.svg'),
           // child: Image.asset('', width: 150, height: 54)),
         )
       )
