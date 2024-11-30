@@ -218,8 +218,8 @@ class CoastalPathFinder:
         has_tourspot = any(coord["type"].lower() == "tourspot" for coord in coords)
 
         result = {
-            "totalDistance": self.total_distance/1000,  # km로 변환
-            "hasTourspot": has_tourspot,
+            "total_distance": self.total_distance/1000,
+            "has_tourspot": has_tourspot,
             "path": coords
         }
 
