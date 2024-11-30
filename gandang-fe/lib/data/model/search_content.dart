@@ -1,4 +1,4 @@
-class StarContent {
+class SearchContent {
   final int id;
   final double start_latitude;
   final double start_longitude;
@@ -10,7 +10,7 @@ class StarContent {
   final DateTime created_at;
   final bool starred;
 
-  StarContent(this.id, this.start_latitude, this.start_longitude,
+  SearchContent(this.id, this.start_latitude, this.start_longitude,
       this.start_address, this.end_latitude, this.end_longitude,
       this.end_address, this.distance, this.created_at, this.starred);
 
@@ -29,8 +29,8 @@ class StarContent {
     };
   }
 
-  factory StarContent.fromJson(Map<String, dynamic> json){
-    return StarContent(
+  factory SearchContent.fromJson(Map<String, dynamic> json){
+    return SearchContent(
         json['id'],
         json['start_latitude'],
         json['start_longitude'],

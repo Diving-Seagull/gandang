@@ -25,7 +25,6 @@ class PlaceDataSource {
     final urlPath = '$kakao_url$query';
     await dotenv.load(fileName: 'assets/config/.env');
     var kakao_token = dotenv.env['KAKAO_REST_API_KEY'];
-    print(kakao_token);
     headers['Authorization'] = 'KakaoAK ${kakao_token}';
     try{
       http.Response response =
@@ -53,6 +52,28 @@ class PlaceDataSource {
     }
     return null;
   }
+
+  Future<String?> getAddressFromCoordinates(double latitude, double longitude) async {
+    final url = Uri.parse('https://dapi.kakao.com/v2/local/geo/coord2address.json?x=$longitude&y=$latitude');
+    await dotenv.load(fileName: 'assets/config/.env');
+    var kakao_token = dotenv.env['KAKAO_REST_API_KEY'];
+    try {
+      headers['Authorization'] = 'KakaoAK ${kakao_token}';
+      final response = await RestApiSession.getUrl(url, headers);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final address = data['documents']?.first['road_address']?['address_name'];
+        return address ?? '도로명 주소를 찾을 수 없습니다.';
+      } else {
+        print('Error: ${response.statusCode}');
+        return 'getAddressFromCoordinates API 호출 실패';
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return 'getAddressFromCoordinates 예외 발생';
+    }
+  }
+
 
   Future<StationDto?> getBicycleStation(double lat, double lng, TokenDto tokenDto) async {
     var path = '$_uriPath&latitude=$lat&longitude=$lng';

@@ -26,18 +26,11 @@ class SearchResultView extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _SearchResultView(info);
 }
 
-class _SearchResultView extends ConsumerState<SearchResultView>
-    with SingleTickerProviderStateMixin {
+class _SearchResultView extends ConsumerState<SearchResultView> with SingleTickerProviderStateMixin {
   final Completer<NaverMapController> mapControllerCompleter = Completer();
-  late NOverlayImage _customLocImage, orangeBicycleImg, orangeMarker, greenMarker;
-  StreamSubscription<Position>? _positionStream;
-  late NaverMapController _mapController;
-  late NMarker user_marker;
-  late Position position;
   final TextEditingController startController = TextEditingController(),
       finishController = TextEditingController();
   final PlaceViewModel _placeViewModel = PlaceViewModel();
-  late SearchedInfo info;
   final List<NLatLng> tmpPath = [
     NLatLng(33.2207094, 126.2492983),
     NLatLng(33.2214586, 126.2487727),
@@ -231,7 +224,18 @@ class _SearchResultView extends ConsumerState<SearchResultView>
     NLatLng(33.26062107705835, 126.18260042875335),
     NLatLng(33.26119366310708, 126.18227082818137)
   ];
+
+  late NOverlayImage _customLocImage, orangeBicycleImg, orangeMarker, greenMarker;
+  late NaverMapController _mapController;
+  late SearchedInfo info;
+  late NMarker user_marker;
+  late Position position;
+
+  StreamSubscription<Position>? _positionStream;
   int _selectedIndex = 0;
+  bool isStartChecked = false;
+  Color selectedColor = ColorData.PRIMARY_COLOR;
+  List<NLatLng> startBicycleRoadData = [], endBicycleRoadData = [];
   _SearchResultView(this.info);
 
   @override
@@ -255,6 +259,15 @@ class _SearchResultView extends ConsumerState<SearchResultView>
   void _onTabPressed(int index) {
     setState(() {
       _selectedIndex = index;
+      if(_selectedIndex == 0) {
+        selectedColor = ColorData.PRIMARY_COLOR;
+        isStartChecked = false;
+        getRecentRideLoc();
+      }
+      else {
+        selectedColor = ColorData.PRI_SEC;
+        isStartChecked = true;
+      }
     });
   }
 
@@ -370,89 +383,109 @@ class _SearchResultView extends ConsumerState<SearchResultView>
                                   )
                               ))
                           )),
-                        Container(
-                            width: DeviceSize.getWidth(context),
-                            height: 175,
-                            margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                            padding: const EdgeInsets.only(left: 25, right: 25, top: 20, bottom: 20),
-                            decoration: BoxDecoration(
-                              color: ColorData.COLOR_WHITE,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: ColorData.PRIMARY_COLOR),
-                              boxShadow: [
-                                BoxShadow(color: ColorData.COLOR_BLACK.withOpacity(0.5) ,
-                                  offset: Offset(0, 3), blurRadius: 20)]
-                            ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('예상 소요 시간',
-                                style: TextStyle(
-                                  color: ColorData.CONTENTS_200,
-                                  fontWeight: FontWeight.bold
-                                ),
-                              ),
-                            const Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text('1시간 2분',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 28,
-                                        color: ColorData.PRIMARY_COLOR
-                                    ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Text('|', style: TextStyle(color: ColorData.CONTENTS_100)),
-                                  SizedBox(width: 10),
-                                  Text("23.3km",
-                                    style: TextStyle(
-                                      color: ColorData.CONTENTS_200,
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 12
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const Text('※ 실제 소요 시간은 교통 상황에 따라 다를 수 있습니다.',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 10,
-                                  color: ColorData.CONTENTS_200,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              Container(
-                                  width: DeviceSize.getWidth(context),
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: ColorData.PRIMARY_COLOR,
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  child: TextButton(
-                                    onPressed: () {
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: EdgeInsets.zero, // 안쪽 여백 직접 조정
-                                    ), child: const Text('도착지 정류소 확인하기',
-                                    style: TextStyle(
-                                      color: ColorData.COLOR_WHITE,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14
-                                    ),
-                                  ),
-                                  )
-                              )
-                            ],
-                          ),
-                        )
+                        _destDetailSection()
                       ],
                     )
                   )
                 ]
             )
         )
+    );
+  }
+
+  Widget _destDetailSection() {
+    return endBicycleRoadData.isEmpty ? Container(width: DeviceSize.getWidth(context), height: 175) : Container(
+      width: DeviceSize.getWidth(context),
+      height: 175,
+      margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+      padding: const EdgeInsets.only(left: 25, right: 25, top: 20, bottom: 20),
+      decoration: BoxDecoration(
+          color: ColorData.COLOR_WHITE,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: selectedColor),
+          boxShadow: [
+            BoxShadow(color: ColorData.COLOR_BLACK.withOpacity(0.5) ,
+                offset: const Offset(0, 3), blurRadius: 20)]
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('예상 소요 시간',
+            style: TextStyle(
+                color: ColorData.CONTENTS_200,
+                fontWeight: FontWeight.bold
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('1시간 2분',
+                style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 28,
+                    color: selectedColor
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Text('|', style: TextStyle(color: ColorData.CONTENTS_100)),
+              const SizedBox(width: 10),
+              Text("23.3km",
+                style: TextStyle(
+                    color: ColorData.CONTENTS_200,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12
+                ),
+              )
+            ],
+          ),
+          const Text('※ 실제 소요 시간은 교통 상황에 따라 다를 수 있습니다.',
+            style: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: 10,
+              color: ColorData.CONTENTS_200,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+              width: DeviceSize.getWidth(context),
+              height: 40,
+              decoration: BoxDecoration(
+                color: selectedColor,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: TextButton(
+                onPressed: () async {
+                  if(!isStartChecked) {
+                    setState(() {
+                      isStartChecked = true;
+                    });
+                    int target = (endBicycleRoadData.length / 2).toInt();
+                    await _mapController.updateCamera(
+                      NCameraUpdate.fromCameraPosition(
+                        NCameraPosition(
+                          target: endBicycleRoadData.elementAt(target),
+                          zoom: 13,
+                          tilt: 0, // 3D 효과를 위한 틸트 각도
+                          bearing: 0, // 방향 (0~360°)
+                        ),
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero, // 안쪽 여백 직접 조정
+                ), child: Text(!isStartChecked ? '도착지 정류소 확인하기' : '경로 안내하기 >' ,
+                style: const TextStyle(
+                    color: ColorData.COLOR_WHITE,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14
+                ),
+              ),
+              )
+          )
+        ],
+      ),
     );
   }
 
@@ -472,19 +505,19 @@ class _SearchResultView extends ConsumerState<SearchResultView>
           Flexible(child: _buildTabButton(
             index: 0,
             label: '자전거',
-            icon: Icons.pedal_bike,
             isSelected: _selectedIndex == 0,
-            selectedColor: Colors.orange[100]!,
+            selectedColor: ColorData.SECONDARY_00,
             unselectedColor: Colors.transparent,
+            selectedTextColor: ColorData.PRIMARY_COLOR,
           )),
           // 두 번째 탭 버튼 (자동차)
-          Flexible(child: _buildTabButton(
+            Flexible(child: _buildTabButton(
             index: 1,
             label: '자동차',
-            icon: Icons.directions_car,
             isSelected: _selectedIndex == 1,
-            selectedColor: Colors.green[100]!,
+            selectedColor: ColorData.PRI_SEC10,
             unselectedColor: Colors.transparent,
+              selectedTextColor: ColorData.PRI_SEC
           )),
         ],
       )
@@ -521,35 +554,32 @@ class _SearchResultView extends ConsumerState<SearchResultView>
           target: NLatLng(position.latitude, position.longitude), zoom: 15));
   }
 
+  // 자전거 경로 읽어오기
   void getRecentRideLoc() async {
-    await setNowLocation(false).then((onValue) async {
-      _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'start-loc'));
-      _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'end-loc'));
-      var prefer = await SharedPreferences.getInstance();
-      var token = prefer.getString('jwtToken')!;
-        if(_selectedIndex == 0) {
-          var startBicycleLoc =
-          await _placeViewModel.getBicycleStation(position.latitude, position.longitude, TokenDto(token));
-          var endBicycleLoc =
-          await _placeViewModel.getBicycleStation(info.end_latitude, info.end_longitude, TokenDto(token));
-          if(startBicycleLoc != null && endBicycleLoc != null) {
-            _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-start-loc'));
-            _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-end-loc'));
-            _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-start'));
-            _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-between'));
-            _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-end'));
-
+    if(startBicycleRoadData.isEmpty || endBicycleRoadData.isEmpty) {
+      await setNowLocation(false).then((onValue) async {
+        var prefer = await SharedPreferences.getInstance();
+        var token = prefer.getString('jwtToken')!;
+        var startBicycleLoc =
+        await _placeViewModel.getBicycleStation(position.latitude, position.longitude, TokenDto(token));
+        var endBicycleLoc =
+        await _placeViewModel.getBicycleStation(info.end_latitude, info.end_longitude, TokenDto(token));
+        if(startBicycleLoc != null && endBicycleLoc != null) {
+          clearMapOverlay();
           RoadSearchInfo startInfo =
-            RoadSearchInfo(startName: base64Encode(utf8.encode('a')), startX: position.longitude, startY: position.latitude,
-                endName: base64Encode(utf8.encode(startBicycleLoc.address)), endX: startBicycleLoc.longitude, endY: startBicycleLoc.latitude);
+          RoadSearchInfo(startName: base64Encode(utf8.encode('a')), startX: position.longitude, startY: position.latitude,
+              endName: base64Encode(utf8.encode(startBicycleLoc.address)), endX: startBicycleLoc.longitude, endY: startBicycleLoc.latitude);
           var startRoadData = await _placeViewModel.getWalkingRoute(startInfo);
+          startBicycleRoadData.addAll(startRoadData);
           RoadSearchInfo endInfo =
           RoadSearchInfo(startName: base64Encode(utf8.encode(endBicycleLoc.address)), startX: endBicycleLoc.longitude, startY: endBicycleLoc.latitude,
               endName: base64Encode(utf8.encode(info.end_address)), endX: info.end_longitude, endY: info.end_latitude);
           var endRoadData = await _placeViewModel.getWalkingRoute(endInfo);
-
-          _mapController.addOverlay(NPathOverlay(id: 'bicycle-start', width: 6, coords: startRoadData, color: ColorData.CONTENTS_050));
-          _mapController.addOverlay(NPathOverlay(id: 'bicycle-end', width: 6, coords: endRoadData, color: ColorData.CONTENTS_300));
+          setState(() {
+            this.endBicycleRoadData.addAll(endRoadData);
+          });
+          _mapController.addOverlay(NPathOverlay(id: 'bicycle-start', width: 6, coords: startRoadData, color: ColorData.PRIMARY_COLOR));
+          _mapController.addOverlay(NPathOverlay(id: 'bicycle-end', width: 6, coords: endRoadData, color: ColorData.PRIMARY_COLOR));
 
           //TODO :: 백엔드에서 해안도로 경로 받아와야 함
           List<NLatLng> rideList = [
@@ -557,60 +587,47 @@ class _SearchResultView extends ConsumerState<SearchResultView>
             endRoadData.first
           ];
           _mapController.addOverlay(NPathOverlay(id: 'bicycle-between', width: 6, coords: rideList, color: ColorData.PRIMARY_COLOR));
-            _mapController.addOverlay(
-                NMarker(
-                    id: 'start-loc',
-                    icon: orangeMarker,
-                    size: const Size(38, 46),
-                    position: NLatLng(startRoadData[0].latitude, startRoadData[0].longitude,
-                    )));
-            _mapController.addOverlay(
-                NMarker(
-                    id: 'end-loc',
-                    icon: orangeMarker,
-                    size: const Size(38, 46),
-                    position: NLatLng(endRoadData.last.latitude, endRoadData.last.longitude,
-                    )));
-            _mapController.addOverlay(
-                NMarker(
-                    id: 'bicycle-start-loc',
-                    icon: orangeBicycleImg,
-                    position: NLatLng(startBicycleLoc.latitude, startBicycleLoc.longitude,
-                    )));
-            _mapController.addOverlay(
-                NMarker(
-                    id: 'bicycle-end-loc',
-                    icon: orangeBicycleImg,
-                    position: NLatLng(endBicycleLoc.latitude, endBicycleLoc.longitude,
-                    )));
-
-            int target = (startRoadData.length / 2).toInt();
-            await _mapController.updateCamera(
-              NCameraUpdate.fromCameraPosition(
-                NCameraPosition(
-                  target: startRoadData.elementAt(target),
-                  zoom: 13,
-                  tilt: 0, // 3D 효과를 위한 틸트 각도
-                  bearing: 0, // 방향 (0~360°)
-                ),
-              ),
-            );
-            await Future.delayed(Duration(seconds: 2));
-            target = (endRoadData.length / 2).toInt();
-            await _mapController.updateCamera(
-              NCameraUpdate.fromCameraPosition(
-                NCameraPosition(
-                  target: endRoadData.elementAt(target),
-                  zoom: 13,
-                  tilt: 0, // 3D 효과를 위한 틸트 각도
-                  bearing: 0, // 방향 (0~360°)
-                ),
-              ),
-            );
-            await Future.delayed(Duration(seconds: 2));
+          _mapController.addOverlay(
+              NMarker(
+                  id: 'start-loc',
+                  icon: orangeMarker,
+                  size: const Size(38, 46),
+                  position: NLatLng(startRoadData[0].latitude, startRoadData[0].longitude,
+                  )));
+          _mapController.addOverlay(
+              NMarker(
+                  id: 'end-loc',
+                  icon: orangeMarker,
+                  size: const Size(38, 46),
+                  position: NLatLng(endRoadData.last.latitude, endRoadData.last.longitude,
+                  )));
+          _mapController.addOverlay(
+              NMarker(
+                  id: 'bicycle-start-loc',
+                  icon: orangeBicycleImg,
+                  position: NLatLng(startBicycleLoc.latitude, startBicycleLoc.longitude,
+                  )));
+          _mapController.addOverlay(
+              NMarker(
+                  id: 'bicycle-end-loc',
+                  icon: orangeBicycleImg,
+                  position: NLatLng(endBicycleLoc.latitude, endBicycleLoc.longitude,
+                  )));
         }
-      }
-    });
+      });
+    }
+    int target = (startBicycleRoadData.length / 2).toInt();
+    await _mapController.updateCamera(
+      NCameraUpdate.fromCameraPosition(
+        NCameraPosition(
+          target: startBicycleRoadData.elementAt(target),
+          zoom: 13,
+          tilt: 0, // 3D 효과를 위한 틸트 각도
+          bearing: 0, // 방향 (0~360°)
+        ),
+      ),
+    );
+    await Future.delayed(const Duration(seconds: 2));
   }
 
   // 경로 안내
@@ -629,6 +646,17 @@ class _SearchResultView extends ConsumerState<SearchResultView>
       );
       await Future.delayed(Duration(seconds: 1));
     }
+  }
+
+  void clearMapOverlay(){
+    _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'start-loc'));
+    _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'end-loc'));
+
+    _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-start-loc'));
+    _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-end-loc'));
+    _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-start'));
+    _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-between'));
+    _mapController.deleteOverlay(const NOverlayInfo(type: NOverlayType.pathOverlay, id: 'bicycle-end'));
   }
 
   Widget _setSearch() {
@@ -675,10 +703,7 @@ class _SearchResultView extends ConsumerState<SearchResultView>
                 contentPadding: EdgeInsets.all(0)
             ),
             controller: startController,
-            onSubmitted: (text){
-              print(startController.text);
-              _searchPath();
-            },
+            readOnly: true
           )),
           Flexible(child: Container(
             height: 1,
@@ -696,10 +721,7 @@ class _SearchResultView extends ConsumerState<SearchResultView>
                 contentPadding: EdgeInsets.all(0)
             ),
             controller: finishController,
-            onSubmitted: (text) {
-              print(text);
-              _searchPath();
-            },
+            readOnly: true,
           )),
         ],
       ),
@@ -757,10 +779,10 @@ class _SearchResultView extends ConsumerState<SearchResultView>
   Widget _buildTabButton({
     required int index,
     required String label,
-    required IconData icon,
     required bool isSelected,
     required Color selectedColor,
     required Color unselectedColor,
+    required Color selectedTextColor
   }) {
     return GestureDetector(
       onTap: () => _onTabPressed(index),
@@ -773,17 +795,12 @@ class _SearchResultView extends ConsumerState<SearchResultView>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.black : Colors.grey, // 선택된 탭에 아이콘 색상 변경
-            ),
-            const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.black : Colors.grey, // 선택된 탭에 글자 색상 변경
+                fontSize: 12,
+                fontWeight: isSelected? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? selectedTextColor : ColorData.CONTENTS_200, // 선택된 탭에 글자 색상 변경
               ),
             ),
           ],

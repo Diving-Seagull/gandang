@@ -4,7 +4,6 @@ import 'package:gandang/data/repository/login_repository.dart';
 
 import '../login/login_datasource.dart';
 import '../model/jwt_data.dart';
-import 'login_provider.dart';
 
 class LoginNotifier extends StateNotifier<AsyncValue<JwtData?>> {
   final LoginRepository repository;

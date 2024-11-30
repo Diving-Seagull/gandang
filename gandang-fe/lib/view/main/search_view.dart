@@ -5,18 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gandang/data/model/add_star_dto.dart';
 import 'package:gandang/data/model/searched_info.dart';
-import 'package:gandang/data/model/star_content.dart';
-import 'package:gandang/data/model/star_data.dart';
+import 'package:gandang/data/model/search_content.dart';
+import 'package:gandang/data/model/search_data.dart';
 import 'package:gandang/data/model/token_dto.dart';
 import 'package:gandang/data/provider/place_provider.dart';
-import 'package:gandang/data/provider/star_provider.dart';
+import 'package:gandang/data/provider/route_provider.dart';
 import 'package:gandang/view/global/device_size.dart';
 import 'package:gandang/view/global/path_paint.dart';
 import 'package:gandang/view/main/search_result_view.dart';
 import 'package:gandang/viewmodel/place_viewmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../data/login/star_datasource.dart';
+import '../../data/login/route_datasource.dart';
 import '../../data/model/add_star_result.dart';
 import '../../data/model/query_detail.dart';
 import '../global/color_data.dart';
@@ -36,12 +36,12 @@ class _SearchView extends ConsumerState<SearchView> {
   final PlaceViewModel _placeViewModel = PlaceViewModel();
 
   // 사용자 데이터를 비동기로 관리하는 StateNotifier
-  final starProvider = FutureProvider<List<StarContent>?>((ref) async {
+  final searchedProvider = FutureProvider<List<SearchContent>?>((ref) async {
     try{
       SharedPreferences pref = await SharedPreferences.getInstance();
       String token = pref.getString('jwtToken')!;
-      final repository = ref.read(starRepositoryProvider);
-      var result = await repository.getStarRoutes(TokenDto(token));
+      final repository = ref.read(routeRepositoryProvider);
+      var result = await repository.getRecentRoutes(TokenDto(token));
       print('starProvider $result');
       return result;
     } catch(e) {
@@ -53,7 +53,7 @@ class _SearchView extends ConsumerState<SearchView> {
     try{
       SharedPreferences pref = await SharedPreferences.getInstance();
       String token = pref.getString('jwtToken')!;
-      final repository = ref.read(starRepositoryProvider);
+      final repository = ref.read(routeRepositoryProvider);
       var result = await repository.postStarRoute(id, TokenDto(token));
       print('addStarProvider ${result!.star_id}');
       return result;
@@ -69,7 +69,7 @@ class _SearchView extends ConsumerState<SearchView> {
 
   @override
   Widget build(BuildContext context) {
-    var recentSearchState = ref.watch(starProvider);
+    var recentSearchState = ref.watch(searchedProvider);
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -194,7 +194,7 @@ class _SearchView extends ConsumerState<SearchView> {
     );
   }
 
-  Widget _recentSearchSection(List<StarContent> dataList) {
+  Widget _recentSearchSection(List<SearchContent> dataList) {
     return Expanded(child: Padding(
         padding: EdgeInsets.all(25),
         child: Column(
@@ -229,7 +229,7 @@ class _SearchView extends ConsumerState<SearchView> {
                                     IconButton(onPressed: (){
                                       var watch = ref.watch(addStarProvider(data.id));
                                       watch.whenData((data) {
-                                        ref.refresh(starProvider);
+                                        ref.refresh(searchedProvider);
                                       });
                                     }, icon: SvgPicture.asset('assets/images/non-star.svg'))
                                 ),
@@ -294,7 +294,7 @@ class _SearchView extends ConsumerState<SearchView> {
     }
   }
 
-  void _searchRecentPath(StarContent content) {
+  void _searchRecentPath(SearchContent content) {
     var info = SearchedInfo(
         content.start_address, content.start_latitude, content.start_longitude,
         content.end_address, content.end_latitude, content.end_longitude);
