@@ -1,0 +1,59 @@
+{
+  "family": "gandang",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::010928195927:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::010928195927:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "gandang-container",
+      "image": "010928195927.dkr.ecr.ap-northeast-2.amazonaws.com/gandang",
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "docker"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "valueFrom": "arn:aws:ssm:ap-northeast-2:010928195927:parameter/gandang/prod/db-url"
+        },
+        {
+          "name": "SPRING_DATASOURCE_USERNAME",
+          "valueFrom": "arn:aws:ssm:ap-northeast-2:010928195927:parameter/gandang/prod/db-username"
+        },
+        {
+          "name": "SPRING_DATASOURCE_PASSWORD",
+          "valueFrom": "arn:aws:ssm:ap-northeast-2:010928195927:parameter/gandang/prod/db-password"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:ssm:ap-northeast-2:010928195927:parameter/gandang/prod/jwt-secret"
+        },
+        {
+          "name": "GOOGLE_API_KEY",
+          "valueFrom": "arn:aws:ssm:ap-northeast-2:010928195927:parameter/gandang/prod/google-api-key"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/gandang",
+          "awslogs-region": "ap-northeast-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
