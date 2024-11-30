@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class ColorData {
   static const Color COLOR_WHITE = Color(0xFFFFFFFF);
+  static const Color COLOR_BLACK = Color(0xFF000000);
   static const Color PRIMARY_COLOR = Color(0xFFFD7000);
   static const Color SECONDARY_06 = Color(0xFF1D725F);
   static const Color CONTENTS_050 = Color(0xFFF1F1F1);
