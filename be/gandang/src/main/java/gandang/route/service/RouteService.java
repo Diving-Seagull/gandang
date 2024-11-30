@@ -8,6 +8,7 @@ import gandang.common.exception.CustomException;
 import gandang.common.utils.AddressParser;
 import gandang.member.entity.Member;
 import gandang.member.service.MemberService;
+import gandang.route.dto.CoastalPathResponseDto;
 import gandang.route.dto.PopularDestinationDto;
 import gandang.route.dto.RouteRequestDto;
 import gandang.route.dto.RouteResponseDto;
@@ -17,7 +18,6 @@ import gandang.route.entity.RouteStar;
 import gandang.route.repository.RouteRepository;
 import gandang.route.repository.RouteStarRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +32,7 @@ public class RouteService {
     private final RouteRepository routeRepository;
     private final RouteStarRepository routeStarRepository;
     private final MemberService memberService;
+    private final CoastalPathService coastalPathService;
 
     @Transactional(readOnly = true)
     public Page<RouteResponseDto> getRoutes(String email, Pageable pageable) {
@@ -52,9 +53,11 @@ public class RouteService {
             .startLatitude(route.getStartLatitude())
             .startLongitude(route.getStartLongitude())
             .startAddress(route.getStartAddress())
+            .startName(route.getStartName())
             .endLatitude(route.getEndLatitude())
             .endLongitude(route.getEndLongitude())
             .endAddress(route.getEndAddress())
+            .endName(route.getEndName())
             .distance(route.getDistance())
             .createdAt(route.getCreatedAt())
             .isStarred(starredRouteIds.contains(route.getId()))
@@ -72,9 +75,11 @@ public class RouteService {
             .startLatitude(route.getStartLatitude())
             .startLongitude(route.getStartLongitude())
             .startAddress(route.getStartAddress())
+            .startName(route.getStartName())
             .endLatitude(route.getEndLatitude())
             .endLongitude(route.getEndLongitude())
             .endAddress(route.getEndAddress())
+            .endName(route.getEndName())
             .distance(route.getDistance())
             .createdAt(route.getCreatedAt())
             .isStarred(true)
@@ -93,34 +98,34 @@ public class RouteService {
     }
 
     @Transactional
-    public RouteResponseDto createRoute(String email, RouteRequestDto requestDto) {
+    public CoastalPathResponseDto createRoute(String email, RouteRequestDto requestDto) {
         Member member = memberService.getMemberEntityByEmail(email);
 
+        // 길찾기 알고리즘 실행
+        CoastalPathResponseDto pathResult = coastalPathService.findPath(
+            requestDto.getStartLatitude(),
+            requestDto.getStartLongitude(),
+            requestDto.getEndLatitude(),
+            requestDto.getEndLongitude()
+        );
+
+        // Route 엔티티 생성 및 저장
         Route route = Route.builder()
             .member(member)
             .startLatitude(requestDto.getStartLatitude())
             .startLongitude(requestDto.getStartLongitude())
             .startAddress(requestDto.getStartAddress())
+            .startName(requestDto.getStartName())
             .endLatitude(requestDto.getEndLatitude())
             .endLongitude(requestDto.getEndLongitude())
             .endAddress(requestDto.getEndAddress())
-            .distance(requestDto.getDistance())
+            .endName(requestDto.getEndName())
+            .distance(pathResult.getTotalDistance())
             .build();
 
-        Route savedRoute = routeRepository.save(route);
+        routeRepository.save(route);
 
-        return RouteResponseDto.builder()
-            .id(savedRoute.getId())
-            .startLatitude(savedRoute.getStartLatitude())
-            .startLongitude(savedRoute.getStartLongitude())
-            .startAddress(savedRoute.getStartAddress())
-            .endLatitude(savedRoute.getEndLatitude())
-            .endLongitude(savedRoute.getEndLongitude())
-            .endAddress(savedRoute.getEndAddress())
-            .distance(savedRoute.getDistance())
-            .createdAt(savedRoute.getCreatedAt())
-            .isStarred(false)
-            .build();
+        return pathResult;
     }
 
     @Transactional

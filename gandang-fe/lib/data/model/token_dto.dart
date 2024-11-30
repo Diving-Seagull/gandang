@@ -1,8 +1,8 @@
 class TokenDto {
   final String social_token;
-  final String firebase_token;
+  final String? firebase_token;
 
-  TokenDto(this.social_token, this.firebase_token);
+  TokenDto(this.social_token, [this.firebase_token]);
 
   Map<String, dynamic> toJson(){
     return {

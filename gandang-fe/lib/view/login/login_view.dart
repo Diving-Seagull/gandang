@@ -5,8 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gandang/data/global/apple_login_api.dart';
 import 'package:gandang/data/model/jwt_data.dart';
 import 'package:gandang/data/model/token_dto.dart';
-import 'package:gandang/provider/login_notifier.dart';
-import 'package:gandang/provider/login_provider.dart';
 import 'package:gandang/view/global/color_data.dart';
 import 'package:gandang/viewmodel/login_viewmodel.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -204,7 +202,7 @@ class LoginView extends ConsumerWidget {
             var data = TokenDto(login.identityToken!, firebase_token!);
             var result = await _viewModel.setLogin(data, 'apple');
             if(result != null) {
-              print('Apple 로그인 정보 $result');
+              print('Apple 로그인 정보 ${result.token}');
               await prefer.setString('jwtToken', result.token);
               _moveMainScreen(context);
             }

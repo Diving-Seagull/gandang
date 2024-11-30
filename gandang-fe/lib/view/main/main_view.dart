@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_naver_map/flutter_naver_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gandang/data/global/device_size.dart';
+import 'package:gandang/view/global/device_size.dart';
 import 'package:gandang/view/global/color_data.dart';
+import 'package:gandang/view/global/no_animation_route.dart';
+import 'package:gandang/view/main/search_view.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../data/global/location_service.dart';
@@ -21,24 +25,20 @@ class MainView extends ConsumerStatefulWidget{
 class _MainView extends ConsumerState<MainView> {
   // NaverMapController 객체의 비동기 작업 완료를 나타내는 Completer 생성
   final Completer<NaverMapController> mapControllerCompleter = Completer();
+  late NOverlayImage _customMarkerImage;
   StreamSubscription<Position>? _positionStream;
   late NaverMapController _mapController;
-  late NOverlayImage _customMarkerImage;
   late NMarker user_marker;
   late Position position;
 
   @override
   void initState() {
     super.initState();
-    _customMarkerImage = const NOverlayImage.fromAssetImage('assets/images/orange-now.png');
+    _customMarkerImage = NOverlayImage.fromAssetImage('assets/images/orange-now.png');
     user_marker = NMarker(id: DateTime.now().toIso8601String(),
         position: NLatLng(0, 0),
         icon: _customMarkerImage
     );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startListeningToLocationChanges();
-    });
   }
 
   /// 위치 변화 감지 시작
@@ -58,6 +58,8 @@ class _MainView extends ConsumerState<MainView> {
       this.position = position;
       _addMarker();
     });
+
+    setNowLocation();
   }
 
   void setNowLocation() async {
@@ -111,15 +113,28 @@ class _MainView extends ConsumerState<MainView> {
                                 ),
                                 readOnly: true,
                                 onTap: () {
-                                  // 애니메이션 없이 이동
-                                  Navigator.pushReplacement(
-                                    context,
-                                    PageRouteBuilder(
-                                      pageBuilder: (context, animation1, animation2) => SearchView(),
-                                      transitionDuration: Duration.zero,
-                                      reverseTransitionDuration: Duration.zero,
-                                    ),
-                                  );
+                                  if(Platform.isAndroid) {
+                                    // 애니메이션 없이 이동
+                                    Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          pageBuilder: (context, animation1, animation2) => SearchView(),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration: const Duration(microseconds: 300),
+                                        )
+                                    );
+                                  }
+                                  else {
+                                    // 애니메이션 없이 이동
+                                    Navigator.push(
+                                        context,
+                                        NoAnimationRoute(pageBuilder: PageRouteBuilder(
+                                          pageBuilder: (context, animation1, animation2) => SearchView(),
+                                          transitionDuration: Duration.zero,
+                                          reverseTransitionDuration: const Duration(microseconds: 300),
+                                        ).pageBuilder)
+                                    );
+                                  }
                                 },
                               ),
                             )),
@@ -281,9 +296,11 @@ class _MainView extends ConsumerState<MainView> {
         locationButtonEnable: false,    // 위치 버튼 표시 여부 설정
         consumeSymbolTapEvents: false,  // 심볼 탭 이벤트 소비 여부 설정
       ),
-      onMapReady: (controller) async {
+      onMapReady: (controller) {
         _mapController = controller;
+        _mapController.addOverlay(user_marker);
         mapControllerCompleter.complete(controller);  // Completer에 지도 컨트롤러 완료 신호 전송
+        _startListeningToLocationChanges();
         print("onMapReady");
       },
     );
@@ -291,6 +308,7 @@ class _MainView extends ConsumerState<MainView> {
 
   void _addMarker() {
     user_marker.setPosition(NLatLng(position.latitude, position.longitude));
+    _moveCameraTo();
   }
 
   void _moveCameraTo() {

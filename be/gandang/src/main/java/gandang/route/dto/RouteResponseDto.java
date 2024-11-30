@@ -15,9 +15,11 @@ public class RouteResponseDto {
     private Double startLatitude;
     private Double startLongitude;
     private String startAddress;
+    private String startName;
     private Double endLatitude;
     private Double endLongitude;
     private String endAddress;
+    private String endName;
     private Double distance;
     private LocalDateTime createdAt;
     private boolean isStarred;
