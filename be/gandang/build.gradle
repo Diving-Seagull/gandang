@@ -54,6 +54,9 @@ dependencies {
 
 	// JWT 검증
 	implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
+
+	// CSV
+	implementation 'com.opencsv:opencsv:5.7.1'
 }
 
 tasks.named('test') {

@@ -2,10 +2,12 @@ package gandang.route.controller;
 
 import gandang.auth.LoginMember;
 import gandang.member.entity.Member;
+import gandang.route.dto.CoastalPathResponseDto;
 import gandang.route.dto.PopularDestinationDto;
 import gandang.route.dto.RouteRequestDto;
 import gandang.route.dto.RouteResponseDto;
 import gandang.route.dto.RouteStarResponseDto;
+import gandang.route.service.CoastalPathService;
 import gandang.route.service.RouteService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RouteController {
 
     private final RouteService routeService;
+    private final CoastalPathService coastalPathService;
 
     @GetMapping
     public ResponseEntity<Page<RouteResponseDto>> getRoutes(
@@ -75,5 +78,15 @@ public class RouteController {
     public ResponseEntity<Void> removeStar(@LoginMember Member member, @PathVariable Long routeId) {
         routeService.removeStar(member.getEmail(), routeId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/coastal")
+    public ResponseEntity<CoastalPathResponseDto> getCoastalPath(
+        @RequestParam double startLat, @RequestParam double startLon,
+        @RequestParam double endLat, @RequestParam double endLon) {
+
+        CoastalPathResponseDto response = coastalPathService.findPath(startLat, startLon,
+            endLat, endLon);
+        return ResponseEntity.ok(response);
     }
 }
