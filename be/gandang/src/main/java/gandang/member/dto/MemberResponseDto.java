@@ -20,8 +20,7 @@ public class MemberResponseDto {
     private Long id;
     private String email;
     private String name;
-    private String description;
-    private String profile;
+    private String profileImage;
     private SocialType socialType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -32,7 +31,7 @@ public class MemberResponseDto {
             .id(member.getId())
             .email(member.getEmail())
             .name(member.getName())
-            .profile(member.getProfileImage())
+            .profileImage(member.getProfileImage())
             .socialType(member.getSocialType())
             .createdAt(member.getCreatedAt())
             .updatedAt(member.getUpdatedAt())
