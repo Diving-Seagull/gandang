@@ -63,7 +63,8 @@ public class RouteController {
     @PostMapping
     public ResponseEntity<CoastalPathResponseDto> createRoute(@LoginMember Member member,
         @Valid @RequestBody RouteRequestDto requestDto) {
-        CoastalPathResponseDto responseDto = routeService.createRoute(member.getEmail(), requestDto);
+        CoastalPathResponseDto responseDto = routeService.createRoute(member.getEmail(),
+            requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 

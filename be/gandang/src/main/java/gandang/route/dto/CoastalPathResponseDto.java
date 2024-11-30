@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CoastalPathResponseDto {
+
     private Double totalDistance;  // km 단위
     private boolean hasTourspot;
     private List<CoastalPathDto> path;

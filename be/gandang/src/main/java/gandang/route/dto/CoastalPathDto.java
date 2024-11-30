@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CoastalPathDto {
+
     private Double lat;
     private Double lng;
     private String type;

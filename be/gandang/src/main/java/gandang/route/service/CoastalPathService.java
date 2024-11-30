@@ -1,21 +1,14 @@
 package gandang.route.service;
 
-import static gandang.common.exception.ExceptionCode.CSV_PARSING_ERROR;
 import static gandang.common.exception.ExceptionCode.INVALID_COORDINATES;
 import static gandang.common.exception.ExceptionCode.PYTHON_SCRIPT_EXECUTION_ERROR;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
 import gandang.common.exception.CustomException;
-import gandang.route.dto.CoastalPathDto;
 import gandang.route.dto.CoastalPathResponseDto;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;

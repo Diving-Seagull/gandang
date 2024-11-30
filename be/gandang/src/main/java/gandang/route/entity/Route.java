@@ -80,8 +80,10 @@ public class Route {
     private List<RouteStar> routeStars = new ArrayList<>();
 
     @Builder
-    public Route(Member member, Double startLatitude, Double startLongitude, String startAddress, String startName,
-        Double endLatitude, Double endLongitude, String endAddress, String endName, Double distance) {
+    public Route(Member member, Double startLatitude, Double startLongitude, String startAddress,
+        String startName,
+        Double endLatitude, Double endLongitude, String endAddress, String endName,
+        Double distance) {
         this.member = member;
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;
