@@ -36,4 +36,13 @@ class PlaceRepository  {
       throw Exception('Failed to road route $e');
     }
   }
+
+  Future<String?> getAddressFromCoordinates(double latitude, double longitude) async {
+    try{
+      var routePoints = await placeDataSource.getAddressFromCoordinates(latitude, longitude);
+      return routePoints;
+    }catch(e) {
+      throw Exception('Failed to road route $e');
+    }
+  }
 }
