@@ -1,5 +1,7 @@
 import 'package:gandang/data/model/add_star_dto.dart';
 import 'package:gandang/data/model/recommend_dto.dart';
+import 'package:gandang/data/model/route_req.dart';
+import 'package:gandang/data/model/routes_dto.dart';
 import 'package:gandang/data/model/search_content.dart';
 import 'package:gandang/data/model/search_data.dart';
 
@@ -29,6 +31,15 @@ class RouteRepository {
       return result;
     } catch (e) {
       throw Exception('Failed to fetch users from repository: $e');
+    }
+  }
+
+  Future<RoutesDto?> postRoutes(RouteReq req, TokenDto tokenDto) async {
+    try {
+      var result = await starDataSource.postRoutes(req, tokenDto);
+      return result;
+    } catch (e) {
+      throw Exception('Failed to postRoutes from repository: $e');
     }
   }
 
