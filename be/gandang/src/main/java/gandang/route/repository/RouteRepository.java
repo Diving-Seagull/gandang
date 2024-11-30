@@ -27,11 +27,11 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
     Page<Route> findAllByRouteStarsMember(@Param("member") Member member, Pageable pageable);
 
     @Query("SELECT new gandang.route.dto.PopularDestinationDto(" +
-        "r.endAddress, r.endLatitude, r.endLongitude, COUNT(r), " +
+        "r.endAddress, r.endLatitude, r.endLongitude, r.endName, COUNT(r), " +
         "MAX(r.createdAt), MIN(r.distance)) " +
         "FROM Route r " +
         "WHERE r.startAddress LIKE %:area% " +
-        "GROUP BY r.endAddress, r.endLatitude, r.endLongitude " +
+        "GROUP BY r.endAddress, r.endLatitude, r.endLongitude, r.endName " +
         "ORDER BY COUNT(r) DESC, MAX(r.createdAt) DESC")
     List<PopularDestinationDto> findPopularDestinations(
         @Param("area") String area,

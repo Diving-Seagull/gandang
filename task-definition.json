@@ -9,7 +9,7 @@
   "containerDefinitions": [
     {
       "name": "gandang-container",
-      "image": "010928195927.dkr.ecr.ap-northeast-2.amazonaws.com/gandang",
+      "image": "010928195927.dkr.ecr.ap-northeast-2.amazonaws.com/gandang:latest",
       "portMappings": [
         {
           "containerPort": 8080,
