@@ -22,6 +22,7 @@ import '../../data/global/location_service.dart';
 import '../../data/model/recommend_dto.dart';
 import '../../data/model/token_dto.dart';
 import '../../data/provider/route_provider.dart';
+import '../global/convert_time.dart';
 
 class MainView extends ConsumerStatefulWidget{
   const MainView({super.key});
@@ -409,6 +410,7 @@ class _MainView extends ConsumerState<MainView> {
   }
 
   Widget _destDetailSection(String start_addr, RecommendDto endData) {
+    var time = ConvertTime.instance.convertDecimalToTime(20 / endData.distance);
     return Container(
       width: DeviceSize.getWidth(context),
       height: 175,
@@ -434,7 +436,7 @@ class _MainView extends ConsumerState<MainView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text('1시간 2분',
+              Text('$time',
                 style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 28,
@@ -444,7 +446,7 @@ class _MainView extends ConsumerState<MainView> {
               const SizedBox(width: 10),
               const Text('|', style: TextStyle(color: ColorData.CONTENTS_100)),
               const SizedBox(width: 10),
-              Text("23.3km",
+              Text("${endData.distance.toStringAsFixed(1)}km",
                 style: TextStyle(
                     color: ColorData.CONTENTS_200,
                     fontWeight: FontWeight.w500,
