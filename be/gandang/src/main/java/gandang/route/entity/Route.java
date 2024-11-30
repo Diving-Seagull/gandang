@@ -48,6 +48,9 @@ public class Route {
     @Column(nullable = false)
     private String startAddress;
 
+    @Column(nullable = false)
+    private String startName;
+
     // 도착지 정보
     @Column(nullable = false)
     private Double endLatitude;
@@ -57,6 +60,9 @@ public class Route {
 
     @Column(nullable = false)
     private String endAddress;
+
+    @Column(nullable = false)
+    private String endName;
 
     // 이동 거리 (단위: 미터)
     @Column(nullable = false)
@@ -75,14 +81,18 @@ public class Route {
 
     @Builder
     public Route(Member member, Double startLatitude, Double startLongitude, String startAddress,
-        Double endLatitude, Double endLongitude, String endAddress, Double distance) {
+        String startName,
+        Double endLatitude, Double endLongitude, String endAddress, String endName,
+        Double distance) {
         this.member = member;
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;
         this.startAddress = startAddress;
+        this.startName = startName;
         this.endLatitude = endLatitude;
         this.endLongitude = endLongitude;
         this.endAddress = endAddress;
+        this.endName = endName;
         this.distance = distance;
     }
 }

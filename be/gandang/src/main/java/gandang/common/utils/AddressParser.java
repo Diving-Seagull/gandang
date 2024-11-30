@@ -1,13 +1,14 @@
 package gandang.common.utils;
 
-import lombok.Getter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import lombok.Getter;
 
 public class AddressParser {
 
     @Getter
     public static class AddressComponents {
+
         private final String province;      // 시/도
         private final String city;          // 시/군/구
         private final String district;      // 읍/면/동
