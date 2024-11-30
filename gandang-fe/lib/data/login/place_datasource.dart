@@ -98,6 +98,12 @@ class PlaceDataSource {
         if(path['type'] == 'Point'){
           routePoints.add(NLatLng(path['coordinates'][1], path['coordinates'][0]));
         }
+        else if(path['type'] == 'LineString') {
+          var points = path['coordinates'];
+          for(var point in points) {
+            routePoints.add(NLatLng(point[1], point[0]));
+          }
+        }
       }
       return routePoints;
     } else {
