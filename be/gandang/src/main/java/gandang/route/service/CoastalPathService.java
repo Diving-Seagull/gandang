@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
 @Service
 @Slf4j
@@ -25,33 +26,37 @@ public class CoastalPathService {
     @Value("${python.script.path}")
     private String scriptPath;
 
-    @Value("${python.data.path}")
-    private String dataPath;
-
-    @Value("${python.network.path}")
-    private String networkPath;
-
     public CoastalPathResponseDto findPath(double startLat, double startLon, double endLat,
         double endLon) {
         validateCoordinates(startLat, startLon, endLat, endLon);
 
         try {
+            String scriptFullPath = ResourceUtils.getFile("classpath:" + scriptPath)
+                .getAbsolutePath();
+            String csvPath = ResourceUtils.getFile(
+                "classpath:python/jeju_coastal_intersections_sorted.csv").getAbsolutePath();
+            String networkPath = ResourceUtils.getFile("classpath:python/jeju_network.pkl")
+                .getAbsolutePath();
+            String outputDir = ResourceUtils.getFile("classpath:python").getAbsolutePath();
+
             List<String> command = Arrays.asList(
                 pythonExecutable,
-                scriptPath,
+                scriptFullPath,
                 String.valueOf(startLat),
                 String.valueOf(startLon),
                 String.valueOf(endLat),
                 String.valueOf(endLon),
-                dataPath,
-                networkPath
+                csvPath,
+                networkPath,
+                outputDir  // 결과 파일을 저장할 디렉토리 전달
             );
 
             ProcessBuilder processBuilder = new ProcessBuilder(command);
             processBuilder.redirectErrorStream(true);
 
             // 작업 디렉토리 설정
-            processBuilder.directory(new File("/app/python"));
+            File pythonDir = ResourceUtils.getFile("classpath:python");
+            processBuilder.directory(pythonDir);
 
             Process process = processBuilder.start();
 
