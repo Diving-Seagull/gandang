@@ -3,7 +3,6 @@ package gandang.route.service;
 import static gandang.common.exception.ExceptionCode.CSV_PARSING_ERROR;
 import static gandang.common.exception.ExceptionCode.INVALID_COORDINATES;
 import static gandang.common.exception.ExceptionCode.PYTHON_SCRIPT_EXECUTION_ERROR;
-import static gandang.common.exception.ExceptionCode.PYTHON_SCRIPT_NOT_FOUND;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
@@ -13,7 +12,6 @@ import gandang.route.dto.CoastalPathDto;
 import gandang.route.dto.CoastalPathResponseDto;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -74,7 +72,8 @@ public class CoastalPathService {
             StringBuilder resultJson = new StringBuilder();
             boolean isReadingResult = false;
 
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     if (line.equals("RESULT_START")) {
@@ -109,45 +108,6 @@ public class CoastalPathService {
         } catch (Exception e) {
             log.error("Error during Python script execution", e);
             throw new CustomException(PYTHON_SCRIPT_EXECUTION_ERROR);
-        }
-    }
-
-    private CoastalPathResponseDto readResultCsv(String fullPath) {
-        try (CSVReader reader = new CSVReader(new FileReader(fullPath))) {
-            // 메타데이터 읽기
-            String[] totalDistanceLine = reader.readNext();
-            Double totalDistance = Double.parseDouble(totalDistanceLine[2]);
-
-            String[] hasTourspotLine = reader.readNext();
-            boolean hasTourspot = Boolean.parseBoolean(hasTourspotLine[2]);
-
-            // 헤더 건너뛰기
-            reader.readNext();
-
-            // 경로 데이터 읽기
-            List<CoastalPathDto> path = new ArrayList<>();
-            String[] line;
-            while ((line = reader.readNext()) != null) {
-                path.add(CoastalPathDto.builder()
-                    .lat(Double.parseDouble(line[0]))
-                    .lng(Double.parseDouble(line[1]))
-                    .type(line[2])
-                    .name(line[3])
-                    .build());
-            }
-
-            return CoastalPathResponseDto.builder()
-                .totalDistance(totalDistance)
-                .hasTourspot(hasTourspot)
-                .path(path)
-                .build();
-
-        } catch (IOException | CsvValidationException e) {
-            log.error("Error reading CSV file", e);
-            throw new CustomException(CSV_PARSING_ERROR);
-        } catch (NumberFormatException e) {
-            log.error("Error parsing coordinates from CSV", e);
-            throw new CustomException(CSV_PARSING_ERROR);
         }
     }
 

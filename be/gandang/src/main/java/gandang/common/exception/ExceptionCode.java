@@ -47,7 +47,6 @@ public enum ExceptionCode {
     // Python, CSV
     PYTHON_SCRIPT_EXECUTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Python 스크립트 실행 중 오류가 발생했습니다."),
     PYTHON_SCRIPT_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "Python 스크립트 파일을 찾을 수 없습니다."),
-    CSV_PARSING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "결과 파일 처리 중 오류가 발생했습니다."),
     INVALID_COORDINATES(HttpStatus.BAD_REQUEST, "유효하지 않은 좌표값입니다."),
     ;
 
