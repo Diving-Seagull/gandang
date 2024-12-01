@@ -24,6 +24,16 @@ class RouteRepository {
     }
   }
 
+  Future<List<SearchContent>?> getStarredRoutes(TokenDto tokenDto) async {
+    try {
+      var result = await starDataSource.getStarredRoutes(tokenDto);
+      print('starrepository $result');
+      return result;
+    } catch (e) {
+      throw Exception('Failed to fetch users from repository: $e');
+    }
+  }
+
   Future<AddStarResult?> postStarRoute(int id, TokenDto tokenDto) async {
     try {
       var result = await starDataSource.postStarRoutes(id, tokenDto);

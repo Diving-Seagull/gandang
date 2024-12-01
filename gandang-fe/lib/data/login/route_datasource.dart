@@ -50,6 +50,31 @@ class RouteDataSource {
     return null;
   }
 
+  Future<List<SearchContent>?> getStarredRoutes(TokenDto tokenDto) async {
+    String path = '$uriPath/routes/stars';
+    headers['Authorization'] = 'Bearer ${tokenDto.social_token}';
+    try{
+      http.Response response =
+      await RestApiSession.getUrl(Uri.parse(path), headers);
+      final int statusCode = response.statusCode;
+      if(statusCode == 200){
+        final Map<String, dynamic> jsonData = jsonDecode(utf8.decode(response.bodyBytes));
+        List<dynamic> contentList = jsonData['content'];
+        return contentList.map((item) => SearchContent.fromJson(item)).toList();
+      }
+      else {
+        print('getStarRoutes() 에러 발생 $statusCode');
+      }
+    } on http.ClientException {
+      print('인터넷 문제 발생');
+    } on TimeoutException {
+      print('$path TimeoutException');
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
   Future<AddStarResult?> postStarRoutes(int id, TokenDto tokenDto) async {
     String path = '$uriPath/routes/$id/star';
     headers['Authorization'] = 'Bearer ${tokenDto.social_token}';

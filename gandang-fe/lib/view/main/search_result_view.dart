@@ -68,6 +68,8 @@ class _SearchResultView extends ConsumerState<SearchResultView> with SingleTicke
         icon: _selectedIndex == 0 ? const NOverlayImage.fromAssetImage('assets/images/orange-now.png') : const NOverlayImage.fromAssetImage('assets/images/green-now.png'),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      GpsLocate.lat = info.start_latitude;
+      GpsLocate.lng = info.start_longitude;
       startController.text = (info.start_text ?? '');
       finishController.text = (info.end_text ?? '');
       // _startListeningToLocationChanges();
@@ -260,7 +262,7 @@ class _SearchResultView extends ConsumerState<SearchResultView> with SingleTicke
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Text('${ConvertTime.instance.convertDecimalToTime(resultLoc!.total_distance / (_selectedIndex == 0 ? 20 : 50))}',
+              Text(ConvertTime.instance.convertDecimalToTime(resultLoc!.total_distance / (_selectedIndex == 0 ? 20 : 50)),
                 style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 28,
@@ -404,7 +406,6 @@ class _SearchResultView extends ConsumerState<SearchResultView> with SingleTicke
   // 자전거 경로 읽어오기
   void getRecentRideLoc() async {
     if(bicycleRoadData.isEmpty) {
-
       bicycleStartRoadData.clear();
       bicycleEndRoadData.clear();
 
@@ -603,7 +604,7 @@ class _SearchResultView extends ConsumerState<SearchResultView> with SingleTicke
                 ),
               ),
             );
-            await Future.delayed(const Duration(milliseconds: 50));
+            await Future.delayed(const Duration(milliseconds: 500));
           }
           //메인 화면 이동
           await Future.delayed(const Duration(seconds: 1));
@@ -623,7 +624,7 @@ class _SearchResultView extends ConsumerState<SearchResultView> with SingleTicke
               ),
             ),
           );
-          await Future.delayed(const Duration(milliseconds: 50));
+          await Future.delayed(const Duration(milliseconds: 500));
         }
         await Future.delayed(const Duration(seconds: 1));
         Navigator.popUntil(context, (route) => route.isFirst);
@@ -753,7 +754,20 @@ class _SearchResultView extends ConsumerState<SearchResultView> with SingleTicke
         info = SearchedInfo(
             start_address.address_name, start_address.x, start_address.y,
             end_address.address_name, end_address.x, end_address.y, start, finish);
-        getRecentRideLoc();
+
+        GpsLocate.lat = info.start_latitude;
+        GpsLocate.lng = info.start_longitude;
+
+        setNowLocation(true);
+
+        if(_selectedIndex == 0) {
+          bicycleRoadData.clear();
+          getRecentRideLoc();
+        }
+        else{
+          carRoadData.clear();
+          getRecentCarLoc();
+        }
       }
     } catch(e) {
       print(e);
