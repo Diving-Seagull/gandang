@@ -13,6 +13,7 @@ import 'package:gandang/view/global/device_size.dart';
 import 'package:gandang/view/global/color_data.dart';
 import 'package:gandang/view/global/no_animation_route.dart';
 import 'package:gandang/view/global/path_paint.dart';
+import 'package:gandang/view/main/mypage_view.dart';
 import 'package:gandang/view/main/search_result_view.dart';
 import 'package:gandang/view/main/search_view.dart';
 import 'package:geolocator/geolocator.dart';
@@ -77,10 +78,8 @@ class _MainView extends ConsumerState<MainView> {
       ),
     ).listen((Position position) {
       this.position = position;
-      _addMarker();
+      setNowLocation();
     });
-
-    setNowLocation();
   }
 
   void setNowLocation() async {
@@ -164,7 +163,9 @@ class _MainView extends ConsumerState<MainView> {
                                           borderRadius: BorderRadius.circular(1000),
                                           border: Border.all(color: ColorData.PRIMARY_COLOR)
                                       ),
-                                      child: TextButton(onPressed: (){},
+                                      child: TextButton(onPressed: (){
+                                        Navigator.push(context, CupertinoPageRoute(builder: (builder) => MyPageView()));
+                                      },
                                         style: ElevatedButton.styleFrom(
                                           padding: EdgeInsets.all(0),
                                         ),
@@ -238,7 +239,7 @@ class _MainView extends ConsumerState<MainView> {
                                 borderRadius: BorderRadius.circular(1000),
                                 elevation: 5,
                                 child: IconButton(onPressed: (){
-                                  setNowLocation();
+                                  getLocation();
                                   _moveCameraTo();
                                 },
                                     icon: SvgPicture.asset('assets/images/loc-icon.svg')
@@ -311,7 +312,7 @@ class _MainView extends ConsumerState<MainView> {
                     .end_address.split(' ');
                 var addr = '${addressList[2]}';
                 var start_addr = result.requireData!.split(' ').skip(2).join(' ');
-                var result_addr = addressList.skip(2).join(' ');
+                var result_addr = dataList[index].end_address == dataList[index].end_name ? addressList.skip(2).join(' ') : dataList[index].end_name;
                 return Padding(
                   padding: EdgeInsets.all(25),
                   child: Column(
@@ -394,7 +395,7 @@ class _MainView extends ConsumerState<MainView> {
           return Center(child: Text('에러 발생'));
         }, loading: () {
           return Center(
-              child: CircularProgressIndicator());
+              child: CircularProgressIndicator(color: ColorData.PRIMARY_COLOR));
         });
       }
       else{
@@ -473,7 +474,7 @@ class _MainView extends ConsumerState<MainView> {
                       NoAnimationRoute(pageBuilder: PageRouteBuilder(
                         pageBuilder: (context, animation1, animation2) => SearchResultView(
                             SearchedInfo(start_addr, position.latitude, position.longitude,
-                                endData.end_address, endData.end_latitude, endData.end_longitude)
+                                endData.end_address, endData.end_latitude, endData.end_longitude, start_addr, endData.end_name)
                         ),
                         transitionDuration: Duration.zero,
                         reverseTransitionDuration: const Duration(microseconds: 300),

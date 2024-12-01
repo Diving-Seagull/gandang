@@ -85,7 +85,7 @@ class _SearchView extends ConsumerState<SearchView> {
                   return _recentSearchSection(recentSearchList!);
                 },
                 error: (error, stack) => Text('에러 발생'),
-                loading: () => Center(child: Text('로딩중...'))
+                loading: () => Center(child: CircularProgressIndicator(color: ColorData.PRIMARY_COLOR))
             ),
           ],
         ),
@@ -238,14 +238,14 @@ class _SearchView extends ConsumerState<SearchView> {
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(data.start_address,
+                                    Text(data.start_name,
                                     style: const TextStyle(
                                       fontSize: 14,
                                     ),
                                     softWrap: false,
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                    Text(data.end_address,
+                                    Text(data.end_name,
                                       style: const TextStyle(
                                         fontSize: 14,
                                       ),
@@ -297,7 +297,9 @@ class _SearchView extends ConsumerState<SearchView> {
   void _searchRecentPath(SearchContent content) {
     var info = SearchedInfo(
         content.start_address, content.start_latitude, content.start_longitude,
-        content.end_address, content.end_latitude, content.end_longitude);
+        content.end_address, content.end_latitude, content.end_longitude, content.start_name, content.end_name);
+    startController.text = content.start_name;
+    finishController.text = content.end_name;
     // 애니메이션 없이 이동
     Navigator.push(
         context,
@@ -307,8 +309,5 @@ class _SearchView extends ConsumerState<SearchView> {
           reverseTransitionDuration: const Duration(microseconds: 300),
         ).pageBuilder)
     );
-    // TODO: 선택한 데이터의 출발지 목적지 장소 텍스트 초기화
-    startController.text = '';
-    finishController.text = '';
   }
 }

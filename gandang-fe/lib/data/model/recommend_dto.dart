@@ -2,6 +2,7 @@ class RecommendDto {
   final String end_address;
   final double end_latitude;
   final double end_longitude;
+  final String end_name;
   final int visit_count;
   final DateTime last_visited_at;
   final double distance;
@@ -12,6 +13,7 @@ class RecommendDto {
       "end_latitude": end_latitude,
       "end_longitude": end_longitude,
       "end_address": end_address,
+      "end_name": end_name,
       "visit_count":  visit_count,
       "last_visited_at": last_visited_at,
       "distance": distance,
@@ -23,11 +25,12 @@ class RecommendDto {
         end_address : json['end_address'],
         end_latitude:  json['end_latitude'],
         end_longitude:  json['end_longitude'],
+        end_name: json['end_name'],
         visit_count:  json['visit_count'],
         last_visited_at:  DateTime.parse(json['last_visited_at']),
         distance: json['distance'],
     );
   }
 
-  RecommendDto({required this.end_address, required this.end_latitude, required this.end_longitude, required this.visit_count, required this.last_visited_at, required this.distance});
+  RecommendDto({required this.end_address, required this.end_latitude, required this.end_longitude, required this.end_name, required this.visit_count, required this.last_visited_at, required this.distance});
 }
