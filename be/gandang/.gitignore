@@ -1,0 +1,45 @@
+### Java ###
+*.class
+*.ctxt
+.mtj.tmp/
+
+### Package Files ###
+*.jar
+*.war
+*.nar
+*.ear
+!gradle/wrapper/gradle-wrapper.jar
+
+### Gradle ###
+.gradle
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Spring Boot ###
+**/src/main/resources/application.properties
+**/src/main/resources/application-*.properties
+!**/src/main/resources/application-docker.properties
+**/src/main/resources/application.yml
+**/src/main/resources/application-*.yml
+
+### Build output ###
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Spring / Java specific ###
+spring-test/
+target/
+.spring.pid
+
+### Test reports ###
+test-output/
+reports/
+
+### JVM crash logs ###
+hs_err_pid*
+replay_pid*
