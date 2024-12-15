@@ -5,7 +5,11 @@
 **간당**은 제주 해안도로를 따라 여행하는 관광객들을 위한 드라이브 코스 추천 내비게이션 서비스입니다. 공공 데이터를 활용해 해안도로 중심 경로를 안내하며, 경로 내 2km 이내 관광 명소 정보를 제공하여 제주 자연경관과 특색을 온전히 경험할 수 있도록 돕습니다. 자전거 및 자동차 사용자 모두를 위한 맞춤형 경로와 편리한 기능을 통해 여행의 편의성과 즐거움을 극대화합니다.
 
 ## 서비스 시연 영상
-[![서비스 시연 영상](/esset/mainmockup.png)](https://youtu.be/hUHLqmjQWo8)
+<p align="center">
+  <a href="https://youtu.be/hUHLqmjQWo8">
+    <img src="/esset/thumbnail.png" width="50%" alt="서비스 시연 영상">
+  </a>
+</p>
 
 ## 기획 배경
 
