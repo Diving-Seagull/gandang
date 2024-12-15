@@ -1,5 +1,7 @@
 package gandang.member.dto;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import gandang.member.entity.Member;
 import gandang.member.enums.SocialType;
 import java.time.LocalDateTime;
@@ -12,13 +14,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class MemberResponseDto {
 
     private Long id;
     private String email;
     private String name;
-    private String description;
-    private String profile;
+    private String profileImage;
     private SocialType socialType;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -29,7 +31,7 @@ public class MemberResponseDto {
             .id(member.getId())
             .email(member.getEmail())
             .name(member.getName())
-            .profile(member.getProfileImage())
+            .profileImage(member.getProfileImage())
             .socialType(member.getSocialType())
             .createdAt(member.getCreatedAt())
             .updatedAt(member.getUpdatedAt())

@@ -1,0 +1,6 @@
+osmnx
+pandas
+networkx
+numpy
+shapely
+pyproj
