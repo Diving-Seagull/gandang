@@ -7,7 +7,7 @@
 ## 서비스 시연 영상
 <p align="center">
   <a href="https://youtu.be/hUHLqmjQWo8">
-    <img src="/esset/thumbnail.png" width="50%" alt="서비스 시연 영상">
+    <img src="/esset/thumbnail.png" width="30%" alt="서비스 시연 영상">
   </a>
 </p>
 
